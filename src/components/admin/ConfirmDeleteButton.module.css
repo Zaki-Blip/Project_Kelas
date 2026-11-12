@@ -1,0 +1,58 @@
+.trigger,
+.triggerDisabled {
+  min-height: 44px;
+  padding: 4px 6px;
+  border: 0;
+  background: transparent;
+  color: var(--color-danger);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.trigger:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.triggerDisabled {
+  color: var(--color-muted);
+  cursor: not-allowed;
+  text-decoration: none;
+}
+
+.dialog {
+  width: min(480px, calc(100% - 32px));
+  margin: auto;
+  padding: var(--space-5);
+  border: var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: 8px 8px 0 var(--color-ink);
+  color: var(--color-ink);
+}
+
+.dialog::backdrop {
+  background: var(--color-overlay);
+}
+
+.title {
+  margin-bottom: var(--space-3);
+  font-size: 24px;
+  letter-spacing: -0.03em;
+}
+
+.text {
+  color: var(--color-muted);
+}
+
+.form {
+  margin-top: var(--space-5);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-3);
+}

@@ -1,0 +1,83 @@
+.footer {
+  margin-top: auto;
+  border-top: var(--border);
+  background: var(--color-surface);
+}
+
+.inner {
+  display: grid;
+  gap: var(--space-6);
+  padding-block: var(--space-7);
+}
+
+.brandBlock {
+  display: grid;
+  gap: var(--space-3);
+  max-width: 380px;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: fit-content;
+  font-family: var(--font-heading);
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.brandMark {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: var(--border);
+  border-radius: var(--radius);
+  background: var(--color-yellow);
+  box-shadow: var(--shadow-hover);
+  font-family: var(--font-heading);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.description {
+  color: var(--color-muted);
+  font-size: 14px;
+}
+
+.nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3) var(--space-5);
+  align-content: start;
+  font-weight: 600;
+}
+
+.nav a {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
+
+.nav a:hover,
+.nav a:focus-visible {
+  color: var(--color-blue);
+}
+
+.copy {
+  color: var(--color-muted);
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  .inner {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+  }
+
+  .copy {
+    grid-column: 1 / -1;
+    padding-top: var(--space-5);
+    border-top: 2px solid var(--color-ink);
+  }
+}

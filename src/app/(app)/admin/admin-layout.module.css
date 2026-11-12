@@ -1,0 +1,8 @@
+.shell {
+  display: grid;
+  min-width: 0;
+}
+
+.content {
+  min-width: 0;
+}

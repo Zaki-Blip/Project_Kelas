@@ -1,0 +1,53 @@
+.nav {
+  border-bottom: var(--border);
+  background: var(--color-surface);
+}
+
+.inner {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  padding-block: 10px;
+  scrollbar-width: thin;
+}
+
+.link {
+  display: inline-flex;
+  flex: 0 0 auto;
+  min-height: 44px;
+  align-items: center;
+  padding: 9px 13px;
+  border: 2px solid transparent;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-heading);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+  transition:
+    background-color var(--transition),
+    border-color var(--transition),
+    color var(--transition);
+}
+
+.link:hover {
+  border-color: var(--color-ink);
+  background: var(--color-yellow);
+}
+
+.link:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.active {
+  border-color: var(--color-ink);
+  background: var(--color-ink);
+  color: var(--color-surface);
+  box-shadow: 2px 2px 0 var(--color-blue);
+}
+
+.active:hover {
+  background: var(--color-ink);
+  color: var(--color-surface);
+}

@@ -1,0 +1,180 @@
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  border-bottom: var(--border);
+  background: var(--color-bg);
+}
+
+.inner {
+  display: flex;
+  min-height: var(--header-height);
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-5);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-family: var(--font-heading);
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.brandMark {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border: var(--border);
+  border-radius: var(--radius);
+  background: var(--color-yellow);
+  box-shadow: var(--shadow-hover);
+  font-family: var(--font-heading);
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.brandMark::before {
+  content: "K";
+}
+
+.brandName {
+  white-space: nowrap;
+}
+
+.desktopNav {
+  display: none;
+  align-items: center;
+  gap: var(--space-5);
+}
+
+.navLink {
+  border-bottom: 2px solid transparent;
+  font-weight: 600;
+  transition: border-color var(--transition);
+}
+
+.navLink:hover,
+.navLink:focus-visible {
+  border-color: var(--color-blue);
+}
+
+.desktopActions {
+  display: none;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.loginLink {
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
+
+.userName {
+  max-width: 130px;
+  overflow: hidden;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (min-width: 1024px) {
+  .userName {
+    max-width: 220px;
+  }
+}
+
+.mobileMenu {
+  position: relative;
+}
+
+.menuButton {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  padding: 8px 14px;
+  border: var(--border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-hover);
+  font-family: var(--font-heading);
+  font-weight: 700;
+  list-style: none;
+  cursor: pointer;
+}
+
+.menuButton::-webkit-details-marker {
+  display: none;
+}
+
+.mobileMenu[open] .menuButton {
+  background: var(--color-yellow);
+}
+
+.mobileNav {
+  position: absolute;
+  top: calc(100% + var(--space-3));
+  right: 0;
+  display: grid;
+  width: min(280px, calc(100vw - (var(--gutter) * 2)));
+  padding: var(--space-2);
+  border: var(--border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  box-shadow: var(--shadow);
+}
+
+.mobileNavLink,
+.mobileRegister {
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+}
+
+.mobileNavLink:hover,
+.mobileNavLink:focus-visible {
+  background: var(--color-bg);
+}
+
+.mobileUser {
+  padding: 10px 12px;
+  color: var(--color-muted);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.mobileUser strong {
+  color: var(--color-ink);
+}
+
+.mobileLogout {
+  margin-top: var(--space-2);
+}
+
+.mobileRegister {
+  margin-top: var(--space-2);
+  border: var(--border);
+  background: var(--color-yellow);
+  font-weight: 700;
+}
+
+@media (min-width: 768px) {
+  .desktopNav,
+  .desktopActions {
+    display: flex;
+  }
+
+  .mobileMenu {
+    display: none;
+  }
+}

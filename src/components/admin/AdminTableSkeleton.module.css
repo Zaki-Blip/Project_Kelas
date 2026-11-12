@@ -1,0 +1,22 @@
+.wrap {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.toolbar {
+  height: 64px;
+}
+
+.table {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-hover);
+}
+
+.row {
+  height: 52px;
+}

@@ -1,0 +1,217 @@
+.uploader {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.thumbnailPreview,
+.screenshotPreview {
+  position: relative;
+  overflow: hidden;
+  border: var(--border);
+  border-radius: var(--radius);
+  background: var(--color-bg);
+}
+
+.thumbnailPreview {
+  aspect-ratio: 16 / 10;
+  width: min(100%, 480px);
+}
+
+.screenshotPreview {
+  aspect-ratio: 16 / 10;
+  width: 100%;
+}
+
+.image {
+  object-fit: cover;
+}
+
+.placeholder {
+  display: grid;
+  height: 100%;
+  place-items: center;
+  padding: var(--space-4);
+  color: var(--color-muted);
+  font-size: 14px;
+  text-align: center;
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.fileButton {
+  position: relative;
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 16px;
+  border: var(--border);
+  border-radius: var(--radius);
+  background: var(--color-yellow);
+  box-shadow: var(--shadow-hover);
+  cursor: pointer;
+  font-family: var(--font-heading);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.2;
+  transition:
+    box-shadow var(--transition),
+    transform var(--transition);
+}
+
+.fileButton:hover {
+  box-shadow: var(--shadow);
+  transform: translate(2px, 2px);
+}
+
+.fileButton:focus-within {
+  outline: var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.fileButtonDisabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.fileButtonDisabled:hover {
+  box-shadow: var(--shadow-hover);
+  transform: none;
+}
+
+.fileInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+}
+
+.removeButton,
+.smallButton {
+  min-height: 44px;
+  padding: 6px 10px;
+  border: 0;
+  background: transparent;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.removeButton {
+  color: var(--color-danger);
+}
+
+.smallButton {
+  color: var(--color-ink);
+}
+
+.removeButton:focus-visible,
+.smallButton:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.removeButton:disabled,
+.smallButton:disabled {
+  color: var(--color-muted);
+  cursor: not-allowed;
+  text-decoration: none;
+}
+
+.hint,
+.counter,
+.empty {
+  color: var(--color-muted);
+  font-size: 13px;
+}
+
+.counter {
+  font-weight: 600;
+}
+
+.error {
+  margin: 0;
+  padding: 9px 11px;
+  border: 2px solid var(--color-danger);
+  border-radius: var(--radius-sm);
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.status {
+  color: var(--color-blue);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.screenshotList {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.screenshotItem {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border: 2px solid var(--color-skeleton);
+  border-radius: var(--radius);
+  background: var(--color-bg);
+}
+
+.screenshotFields {
+  display: grid;
+  gap: 6px;
+  align-content: start;
+}
+
+.captionLabel {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.captionInput {
+  width: 100%;
+  min-height: 44px;
+  padding: 9px 11px;
+  border: var(--border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  color: var(--color-ink);
+}
+
+.captionInput:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.screenshotActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+@media (min-width: 640px) {
+  .screenshotItem {
+    grid-template-columns: 220px minmax(0, 1fr);
+    align-items: start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fileButton:hover {
+    transform: none;
+  }
+}

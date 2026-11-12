@@ -1,0 +1,8 @@
+import type { HTMLAttributes } from "react";
+
+import { cn } from "@/lib/cn";
+import styles from "./Skeleton.module.css";
+
+export function Skeleton({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
+  return <div aria-hidden="true" className={cn(styles.skeleton, className)} {...props} />;
+}

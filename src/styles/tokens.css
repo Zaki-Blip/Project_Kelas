@@ -1,0 +1,59 @@
+:root {
+  --color-bg: #faf7f0;
+  --color-ink: #111111;
+  --color-blue: #2f5bff;
+  --color-yellow: #ffd83d;
+  --color-surface: #ffffff;
+  --color-muted: #5a5a5a;
+  --color-border: #111111;
+  --color-danger: #b42318;
+  --color-danger-bg: #fff1f0;
+  --color-success: #067647;
+  --color-success-bg: #ecfdf3;
+  --color-focus: #111111;
+  --color-overlay: rgb(17 17 17 / 45%);
+  --color-skeleton: #ece6d8;
+
+  --border-width: 2px;
+  --border: var(--border-width) solid var(--color-border);
+  --radius-sm: 6px;
+  --radius: 8px;
+  --radius-lg: 12px;
+
+  --shadow: 4px 4px 0 var(--color-ink);
+  --shadow-hover: 2px 2px 0 var(--color-ink);
+  --shadow-lg: 8px 8px 0 var(--color-ink);
+
+  --font-heading: var(--font-space-grotesk), "Segoe UI", sans-serif;
+  --font-body: var(--font-dm-sans), "Segoe UI", sans-serif;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --space-9: 96px;
+
+  --container: 1200px;
+  --gutter: 16px;
+  --header-height: 72px;
+
+  --transition: 120ms ease-out;
+  --focus-ring: 3px solid var(--color-focus);
+  --focus-offset: 3px;
+}
+
+@media (min-width: 640px) {
+  :root {
+    --gutter: 24px;
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --gutter: 32px;
+  }
+}
