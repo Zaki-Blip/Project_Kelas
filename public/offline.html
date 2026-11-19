@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <meta name="theme-color" content="#faf7f0" />
+    <title>Offline — KaryaKelas</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #faf7f0;
+        --ink: #111111;
+        --blue: #2f5bff;
+        --yellow: #ffd83d;
+        --muted: #5a5a5a;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        display: grid;
+        min-height: 100dvh;
+        margin: 0;
+        place-items: center;
+        padding: 24px;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: "Segoe UI", system-ui, sans-serif;
+        line-height: 1.6;
+      }
+
+      main {
+        width: min(100%, 520px);
+        padding: 32px;
+        border: 2px solid var(--ink);
+        border-radius: 12px;
+        background: #ffffff;
+        box-shadow: 8px 8px 0 var(--ink);
+      }
+
+      .mark {
+        display: grid;
+        width: 48px;
+        height: 48px;
+        margin-bottom: 20px;
+        place-items: center;
+        border: 2px solid var(--ink);
+        border-radius: 8px;
+        background: var(--yellow);
+        box-shadow: 2px 2px 0 var(--ink);
+        font-size: 24px;
+        font-weight: 800;
+      }
+
+      p {
+        margin: 0 0 12px;
+        color: var(--muted);
+      }
+
+      h1 {
+        margin: 0 0 12px;
+        font-size: clamp(1.7rem, 5vw, 2.4rem);
+        line-height: 1.1;
+      }
+
+      a {
+        display: inline-flex;
+        min-height: 44px;
+        align-items: center;
+        margin-top: 12px;
+        padding: 10px 16px;
+        border: 2px solid var(--ink);
+        border-radius: 8px;
+        background: var(--blue);
+        box-shadow: 4px 4px 0 var(--ink);
+        color: #ffffff;
+        font-weight: 700;
+        text-decoration: none;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="mark" aria-hidden="true">K</div>
+      <h1>Kamu sedang offline.</h1>
+      <p>
+        KaryaKelas membutuhkan koneksi internet untuk memuat karya terbaru. Sambungkan
+        kembali perangkatmu, lalu coba lagi.
+      </p>
+      <a href="/">Coba Muat Beranda</a>
+    </main>
+  </body>
+</html>

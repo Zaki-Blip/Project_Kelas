@@ -393,7 +393,10 @@ export async function deleteProjectAction(formData: FormData): Promise<void> {
         ...project.images.map((image) => image.imagePath),
       ];
 
-      await prisma.project.delete({ where: { id: projectId } });
+      await prisma.project.delete({
+        where: { id: projectId },
+        select: { id: true },
+      });
     }
   } catch (error) {
     if (

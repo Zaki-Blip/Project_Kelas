@@ -29,6 +29,8 @@ export async function SiteFooter() {
           {user ? (
             <>
               <Link href="/dashboard">Galeri</Link>
+              <Link href="/profil-kelas">Profil Kelas</Link>
+              <Link href="/laporan-pkl">Laporan PKL</Link>
               {isAdmin ? <Link href="/admin">Admin</Link> : null}
             </>
           ) : (

@@ -11,6 +11,7 @@ const PROTECTED_PATHS = [
   "/admin",
   "/projects",
   "/laporan-pkl",
+  "/profil-kelas",
 ] as const;
 
 function isProtectedPath(pathname: string): boolean {
@@ -35,9 +36,13 @@ function buildContentSecurityPolicy(nonce: string): string {
     `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${
       isDevelopment ? " 'unsafe-eval'" : ""
     }`,
+    "script-src-attr 'none'",
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: blob: https://*.public.blob.vercel-storage.com",
     "font-src 'self'",
+    "media-src 'self'",
+    "worker-src 'self'",
+    "manifest-src 'self'",
     `connect-src 'self'${isDevelopment ? " ws: wss:" : ""}`,
     `frame-src ${frameSources}`,
     ...(isDevelopment ? [] : ["upgrade-insecure-requests"]),
@@ -78,7 +83,7 @@ export const config = {
   matcher: [
     {
       source:
-        "/((?!api|_next/static|_next/image|seed/|favicon.ico|robots.txt|sitemap.xml).*)",
+        "/((?!api|_next/static|_next/image|seed/|favicon.ico|robots.txt|sitemap.xml|manifest.webmanifest).*)",
       missing: [
         { type: "header", key: "next-router-prefetch" },
         { type: "header", key: "purpose", value: "prefetch" },

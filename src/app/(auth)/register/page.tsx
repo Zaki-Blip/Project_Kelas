@@ -8,6 +8,13 @@ import styles from "../auth-card.module.css";
 
 export const metadata: Metadata = {
   title: "Daftar",
+  alternates: {
+    canonical: "/register",
+  },
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;

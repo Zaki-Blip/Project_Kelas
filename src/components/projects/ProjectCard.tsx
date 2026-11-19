@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import type { ProjectCardData } from "@/lib/projects/types";
+import { isAllowedImagePath } from "@/lib/security/images";
 import styles from "./ProjectCard.module.css";
 
 type ProjectCardProps = {
@@ -17,14 +18,18 @@ export function ProjectCard({ project, href, actionLabel, priority = false }: Pr
     0,
     project.technologyCount - visibleTechnologies.length,
   );
+  const thumbnailPath =
+    project.thumbnailPath && isAllowedImagePath(project.thumbnailPath)
+      ? project.thumbnailPath
+      : null;
 
   return (
     <article className={styles.card}>
       <Link href={href} className={styles.link}>
         <div className={styles.thumbnail}>
-          {project.thumbnailPath ? (
+          {thumbnailPath ? (
             <Image
-              src={project.thumbnailPath}
+              src={thumbnailPath}
               alt=""
               width={640}
               height={400}

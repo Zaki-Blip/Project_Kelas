@@ -30,6 +30,7 @@ export type ProjectDetailData = {
   githubUrl: string | null;
   previewUrl: string | null;
   publishedAt: Date | null;
+  updatedAt: Date;
   category: {
     name: string;
     slug: string;

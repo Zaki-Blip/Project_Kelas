@@ -10,6 +10,13 @@ export const metadata: Metadata = {
   title: "Laporan PKL",
   description:
     "Kumpulkan hasil laporan Praktik Kerja Lapangan dan pantau status tinjauannya.",
+  alternates: {
+    canonical: "/laporan-pkl",
+  },
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 const notices: Record<string, string> = {

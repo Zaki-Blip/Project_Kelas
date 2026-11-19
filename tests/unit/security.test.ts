@@ -19,6 +19,13 @@ import {
   getPreviewUrl,
   safeNextPath,
 } from "@/lib/security/urls";
+import {
+  getExternalSocialUrl,
+  getSocialLinksFromText,
+  isSafeExternalSocialUrl,
+  normalizeSocialUrlLines,
+  splitSocialUrlLines,
+} from "@/lib/social";
 
 describe("detectImageType", () => {
   it("detects JPEG magic bytes", () => {
@@ -118,6 +125,8 @@ describe("isAllowedImagePath", () => {
       "/seed/screenshots/kasir-kita-1.jpg",
       "/seed/screenshots/kasir-kita-1.jpeg",
       "/seed/screenshots/kasir-kita-1.webp",
+      "/seed/profiles/budi-santoso.png",
+      "/seed/profiles/class.webp",
     ];
 
     for (const value of valid) {
@@ -141,6 +150,8 @@ describe("isAllowedImagePath", () => {
       "/seed/thumbnails/../foo.png",
       "/seed/thumbnails/foo/bar.png",
       "/seed/other/foo.png",
+      "/seed/profiles/../foo.png",
+      "/seed/profiles/foo.gif",
       "/seed/thumbnails/foo.png?x=1",
       "http://abc123.public.blob.vercel-storage.com/a.png",
       "https://evil.com/a.png",
@@ -271,6 +282,93 @@ describe("getGitHubUrl", () => {
     for (const value of invalid) {
       expect(getGitHubUrl(value)).toBeNull();
     }
+  });
+});
+
+describe("custom social profile URLs", () => {
+  it("accepts HTTPS links on any public host", () => {
+    expect(
+      getExternalSocialUrl("https://www.linkedin.com/company/karyakelas"),
+    ).toBe("https://www.linkedin.com/company/karyakelas");
+    expect(getExternalSocialUrl("https://youtu.be/abc123")).toBe(
+      "https://youtu.be/abc123",
+    );
+    expect(getExternalSocialUrl("https://x.com/karyakelas")).toBe(
+      "https://x.com/karyakelas",
+    );
+    expect(getExternalSocialUrl("  https://kelas.example.com  ")).toBe(
+      "https://kelas.example.com/",
+    );
+  });
+
+  it("rejects insecure, credentialed, custom-port, and local URLs", () => {
+    const invalid = [
+      null,
+      undefined,
+      "",
+      "http://linkedin.com/company/kelas",
+      "https://user:pass@linkedin.com/company/kelas",
+      "https://linkedin.com:8443/company/kelas",
+      "https://localhost/kelas",
+      "https://app.localhost/kelas",
+      "https://internal/kelas",
+      "javascript:alert(1)",
+      "not a url",
+      `https://example.com/${"a".repeat(2048)}`,
+    ];
+
+    for (const value of invalid) {
+      expect(getExternalSocialUrl(value)).toBeNull();
+      expect(isSafeExternalSocialUrl(value ?? "")).toBe(false);
+    }
+  });
+});
+
+describe("student social link text", () => {
+  it("splits, normalizes, and deduplicates one URL per line", () => {
+    expect(
+      splitSocialUrlLines("  https://a.example.com  \n\nhttps://b.example.com  "),
+    ).toEqual(["https://a.example.com", "https://b.example.com"]);
+
+    expect(
+      normalizeSocialUrlLines(
+        "https://GITHUB.com/user\nhttps://github.com/user\nhttp://bad.example.com",
+      ),
+    ).toEqual(["https://github.com/user"]);
+  });
+
+  it("detects common platforms and falls back to the hostname", () => {
+    const links = getSocialLinksFromText(
+      [
+        "https://www.instagram.com/kelas",
+        "https://youtu.be/abc",
+        "https://x.com/kelas",
+        "https://kelas.example.com/profil",
+      ].join("\n"),
+    );
+
+    expect(links).toEqual([
+      {
+        platform: "instagram",
+        label: "Instagram",
+        href: "https://www.instagram.com/kelas",
+      },
+      {
+        platform: "youtube",
+        label: "YouTube",
+        href: "https://youtu.be/abc",
+      },
+      {
+        platform: "x",
+        label: "X",
+        href: "https://x.com/kelas",
+      },
+      {
+        platform: "website",
+        label: "kelas.example.com",
+        href: "https://kelas.example.com/profil",
+      },
+    ]);
   });
 });
 

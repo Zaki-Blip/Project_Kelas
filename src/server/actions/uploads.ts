@@ -27,8 +27,14 @@ export type UploadActionResult =
   | { ok: true; url: string }
   | { ok: false; error: string };
 
+export type UploadScope = "projects" | "profiles";
+
 function extensionFor(type: RasterImageType): string {
   return IMAGE_EXTENSION[type];
+}
+
+function parseScope(value: FormDataEntryValue | null): UploadScope {
+  return value === "profiles" ? "profiles" : "projects";
 }
 
 export async function uploadImageAction(formData: FormData): Promise<UploadActionResult> {
@@ -66,7 +72,7 @@ export async function uploadImageAction(formData: FormData): Promise<UploadActio
       return { ok: false, error: INVALID_IMAGE_ERROR };
     }
 
-    const pathname = `projects/${randomUUID()}/${randomUUID()}.${extensionFor(detectedType)}`;
+    const pathname = `${parseScope(formData.get("scope"))}/${randomUUID()}/${randomUUID()}.${extensionFor(detectedType)}`;
     const blob = await put(pathname, Buffer.from(bytes), {
       access: "public",
       token,

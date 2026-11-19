@@ -143,3 +143,52 @@ button:disabled {
     transition-duration: 0.01ms !important;
   }
 }
+
+@media print {
+  @page {
+    margin: 14mm;
+  }
+
+  html {
+    scroll-behavior: auto;
+  }
+
+  body {
+    background: #ffffff !important;
+    color: #111111 !important;
+    font-size: 11pt;
+    line-height: 1.45;
+  }
+
+  .skipLink,
+  body > div > header,
+  body > div > footer,
+  nav {
+    display: none !important;
+  }
+
+  a {
+    text-decoration: underline !important;
+  }
+
+  img,
+  svg {
+    max-width: 100% !important;
+  }
+
+  h1,
+  h2,
+  h3 {
+    break-after: avoid;
+  }
+
+  figure {
+    break-inside: avoid;
+  }
+
+  article,
+  section,
+  figure {
+    box-shadow: none !important;
+  }
+}

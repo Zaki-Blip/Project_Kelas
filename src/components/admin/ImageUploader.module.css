@@ -17,6 +17,11 @@
   width: min(100%, 480px);
 }
 
+.profilePreview {
+  aspect-ratio: 1;
+  width: min(100%, 320px);
+}
+
 .screenshotPreview {
   aspect-ratio: 16 / 10;
   width: 100%;

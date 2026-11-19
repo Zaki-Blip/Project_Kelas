@@ -23,24 +23,40 @@ export async function generateMetadata({ params }: PreviewPageProps): Promise<Me
   const slug = parseProjectSlug(rawSlug);
 
   if (!slug) {
-    return { title: "Preview tidak ditemukan" };
+    return {
+      title: "Preview tidak ditemukan",
+      robots: { index: false, follow: false },
+    };
   }
 
   const session = await getSession();
 
   if (!session) {
-    return { title: "Live Preview" };
+    return {
+      title: "Live Preview",
+      robots: { index: false, follow: false },
+    };
   }
 
   const project = await getProjectDetail(slug, session.user.role);
 
   if (!project) {
-    return { title: "Preview tidak ditemukan" };
+    return {
+      title: "Preview tidak ditemukan",
+      robots: { index: false, follow: false },
+    };
   }
 
   return {
     title: `Live Preview — ${project.title}`,
     description: `Pratinjau langsung proyek ${project.title}.`,
+    alternates: {
+      canonical: `/projects/${project.slug}/preview`,
+    },
+    robots: {
+      index: false,
+      follow: false,
+    },
   };
 }
 

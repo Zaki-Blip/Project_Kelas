@@ -126,6 +126,12 @@ describe("safeAdminReturnPath", () => {
     expect(safeAdminReturnPath("/admin/projects/new")).toBe(
       "/admin/projects/new",
     );
+    expect(safeAdminReturnPath("/admin/profil-kelas")).toBe(
+      "/admin/profil-kelas",
+    );
+    expect(safeAdminReturnPath("/admin/laporan-pkl")).toBe(
+      "/admin/laporan-pkl",
+    );
     expect(safeAdminReturnPath("/admin#section")).toBe("/admin#section");
     expect(safeAdminReturnPath("  /admin?q=kasir  ")).toBe("/admin?q=kasir");
     expect(safeAdminReturnPath("/admin?q=hello%20world")).toBe(
@@ -251,6 +257,34 @@ describe("getAdminNotice", () => {
     expect(getAdminNotice("taxonomy-in-use")).toEqual({
       kind: "error",
       message: "Data masih digunakan oleh project dan tidak bisa dihapus.",
+    });
+    expect(getAdminNotice("pkl-reviewed")).toEqual({
+      kind: "success",
+      message: "Status laporan PKL berhasil diperbarui.",
+    });
+    expect(getAdminNotice("pkl-deleted")).toEqual({
+      kind: "success",
+      message: "Laporan PKL berhasil dihapus.",
+    });
+    expect(getAdminNotice("profile-updated")).toEqual({
+      kind: "success",
+      message: "Profil kelas berhasil disimpan.",
+    });
+    expect(getAdminNotice("student-created")).toEqual({
+      kind: "success",
+      message: "Profil siswa berhasil ditambahkan.",
+    });
+    expect(getAdminNotice("student-updated")).toEqual({
+      kind: "success",
+      message: "Perubahan profil siswa berhasil disimpan.",
+    });
+    expect(getAdminNotice("student-deleted")).toEqual({
+      kind: "success",
+      message: "Profil siswa berhasil dihapus.",
+    });
+    expect(getAdminNotice("student-not-found")).toEqual({
+      kind: "error",
+      message: "Profil siswa tidak ditemukan.",
     });
   });
 

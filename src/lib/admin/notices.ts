@@ -27,6 +27,26 @@ const notices: Record<string, AdminNoticeData> = {
   "pkl-deleted": { kind: "success", message: "Laporan PKL berhasil dihapus." },
   "pkl-invalid": { kind: "error", message: "Data laporan PKL tidak valid." },
   "pkl-not-found": { kind: "error", message: "Laporan PKL tidak ditemukan." },
+  "profile-updated": {
+    kind: "success",
+    message: "Profil kelas berhasil disimpan.",
+  },
+  "student-created": {
+    kind: "success",
+    message: "Profil siswa berhasil ditambahkan.",
+  },
+  "student-updated": {
+    kind: "success",
+    message: "Perubahan profil siswa berhasil disimpan.",
+  },
+  "student-deleted": {
+    kind: "success",
+    message: "Profil siswa berhasil dihapus.",
+  },
+  "student-not-found": {
+    kind: "error",
+    message: "Profil siswa tidak ditemukan.",
+  },
   "not-found": { kind: "error", message: "Project tidak ditemukan." },
   invalid: {
     kind: "error",

@@ -1,7 +1,6 @@
 import type { PklStatus } from "@/generated/prisma/client";
 
-export type PklSubmissionSummary = {
-  id: string;
+export type PklSubmissionFormData = {
   title: string;
   company: string;
   summary: string;
@@ -9,10 +8,18 @@ export type PklSubmissionSummary = {
   status: PklStatus;
   reviewNote: string | null;
   reviewedAt: Date | null;
-  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type PklSubmissionListItem = {
+  id: string;
+  title: string;
+  company: string;
+  reportUrl: string;
+  status: PklStatus;
+  reviewNote: string | null;
   updatedAt: Date;
   user: {
-    id: string;
     fullName: string;
     username: string;
   };

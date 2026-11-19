@@ -1,0 +1,355 @@
+.grid {
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.card {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  overflow: hidden;
+  border: var(--border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  box-shadow: var(--shadow);
+  transition:
+    box-shadow var(--transition),
+    transform var(--transition);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-hover);
+  transform: translate(2px, 2px);
+}
+
+.photoWrap {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border-bottom: var(--border);
+  background: var(--color-skeleton);
+}
+
+.photoButton {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-ink);
+  text-align: left;
+}
+
+.photoButton:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: -4px;
+}
+
+.photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.initials {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  place-items: center;
+  background:
+    radial-gradient(circle at 25% 20%, var(--color-yellow) 0 18%, transparent 18%),
+    linear-gradient(135deg, var(--color-blue), var(--color-yellow));
+  color: var(--color-ink);
+  font-family: var(--font-heading);
+  font-size: clamp(2.5rem, 8vw, 4.5rem);
+  font-weight: 700;
+  text-shadow: 2px 2px 0 var(--color-surface);
+}
+
+.photoShade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgb(17 17 17 / 70%), transparent 48%);
+  opacity: 0;
+  transition: opacity var(--transition);
+}
+
+.viewHint {
+  position: absolute;
+  inset-inline: 0;
+  bottom: var(--space-3);
+  color: var(--color-surface);
+  font-family: var(--font-heading);
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+  text-shadow: 0 1px 3px rgb(0 0 0 / 85%);
+  opacity: 0;
+  transform: translateY(6px);
+  transition:
+    opacity var(--transition),
+    transform var(--transition);
+}
+
+.card:hover .photoShade,
+.card:focus-within .photoShade,
+.card:hover .viewHint,
+.card:focus-within .viewHint {
+  opacity: 1;
+  transform: none;
+}
+
+.overlay {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  z-index: 2;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px);
+  transition:
+    opacity var(--transition),
+    transform var(--transition),
+    visibility var(--transition);
+}
+
+.card:hover .overlay,
+.card:focus-within .overlay {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+}
+
+.overlayLinks {
+  justify-content: flex-end;
+}
+
+.body {
+  display: grid;
+  gap: 2px;
+  padding: var(--space-3) var(--space-4) var(--space-4);
+}
+
+.name {
+  overflow: hidden;
+  font-size: 18px;
+  letter-spacing: -0.02em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.role {
+  overflow: hidden;
+  color: var(--color-muted);
+  font-size: 13px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dialog {
+  width: min(760px, calc(100vw - 32px));
+  max-height: calc(100dvh - 32px);
+  margin: auto;
+  padding: 0;
+  overflow: auto;
+  border: var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-lg);
+  color: var(--color-ink);
+}
+
+.dialog::backdrop {
+  background: var(--color-overlay);
+}
+
+.dialogCard {
+  position: relative;
+  display: grid;
+}
+
+.closeButton {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-3);
+  z-index: 3;
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border: var(--border);
+  border-radius: 999px;
+  background: var(--color-yellow);
+  box-shadow: var(--shadow-hover);
+  color: var(--color-ink);
+  font-family: var(--font-heading);
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1;
+  transition:
+    box-shadow var(--transition),
+    transform var(--transition);
+}
+
+.closeButton:hover {
+  box-shadow: none;
+  transform: translate(2px, 2px);
+}
+
+.closeButton:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.dialogPhoto {
+  position: relative;
+  min-height: 280px;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-bottom: var(--border);
+  background: var(--color-skeleton);
+}
+
+.dialogInitials {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  place-items: center;
+  background:
+    radial-gradient(circle at 25% 20%, var(--color-yellow) 0 18%, transparent 18%),
+    linear-gradient(135deg, var(--color-blue), var(--color-yellow));
+  color: var(--color-ink);
+  font-family: var(--font-heading);
+  font-size: clamp(3rem, 12vw, 6rem);
+  font-weight: 700;
+  text-shadow: 2px 2px 0 var(--color-surface);
+}
+
+.dialogBody {
+  display: grid;
+  align-content: start;
+  gap: var(--space-3);
+  padding: var(--space-5);
+}
+
+.dialogEyebrow {
+  color: var(--color-muted);
+  font-family: var(--font-heading);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.dialogName {
+  font-size: clamp(2rem, 5vw, 3rem);
+  letter-spacing: -0.045em;
+}
+
+.dialogRole {
+  color: var(--color-blue);
+  font-family: var(--font-heading);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.dialogBio {
+  max-width: 52ch;
+  color: var(--color-muted);
+  font-size: 16px;
+}
+
+.noSocial {
+  color: var(--color-muted);
+  font-size: 14px;
+}
+
+@media (min-width: 640px) {
+  .grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .dialogCard {
+    grid-template-columns: minmax(240px, 300px) minmax(0, 1fr);
+  }
+
+  .dialogPhoto {
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    aspect-ratio: auto;
+    border-right: var(--border);
+    border-bottom: 0;
+  }
+}
+
+@media (min-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card:hover {
+    transform: none;
+  }
+
+  .closeButton:hover {
+    transform: none;
+  }
+}
+
+@media print {
+  .grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8pt;
+  }
+
+  .card {
+    box-shadow: none;
+    break-inside: avoid;
+  }
+
+  .photoWrap {
+    aspect-ratio: 4 / 3;
+    border-bottom: 1px solid #111111;
+  }
+
+  .photoButton {
+    display: block !important;
+    position: static;
+  }
+
+  .photoShade,
+  .viewHint,
+  .overlay,
+  .dialog {
+    display: none !important;
+  }
+
+  .initials,
+  .dialogInitials {
+    color: #111111;
+    text-shadow: none;
+  }
+
+  .body {
+    padding: 6pt 8pt 8pt;
+  }
+
+  .name {
+    font-size: 12pt;
+  }
+
+  .role {
+    font-size: 10pt;
+  }
+}

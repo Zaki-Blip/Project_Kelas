@@ -5,7 +5,11 @@ import { useId, useRef, useState } from "react";
 import type { Dispatch, SetStateAction } from "react";
 
 import { cn } from "@/lib/cn";
-import { discardUploadAction, uploadImageAction } from "@/server/actions/uploads";
+import {
+  discardUploadAction,
+  uploadImageAction,
+  type UploadScope,
+} from "@/server/actions/uploads";
 import styles from "./ImageUploader.module.css";
 
 export type EditableImage = {
@@ -30,9 +34,10 @@ function validateFile(file: File): string | null {
   return null;
 }
 
-async function uploadFile(file: File) {
+async function uploadFile(file: File, scope: UploadScope) {
   const formData = new FormData();
   formData.set("file", file);
+  formData.set("scope", scope);
 
   return uploadImageAction(formData);
 }
@@ -58,6 +63,13 @@ type ThumbnailUploaderProps = {
   onChange: (value: string) => void;
   error?: string[];
   onBusyChange?: (busy: boolean) => void;
+  scope?: UploadScope;
+  label?: string;
+  previewAlt?: string;
+  hint?: string;
+  removeLabel?: string;
+  placeholder?: string;
+  shape?: "wide" | "square";
 };
 
 export function ThumbnailUploader({
@@ -65,6 +77,13 @@ export function ThumbnailUploader({
   onChange,
   error,
   onBusyChange,
+  scope = "projects",
+  label = "thumbnail",
+  previewAlt = "Pratinjau thumbnail project",
+  hint = "JPEG, PNG, atau WebP. Maksimal 3 MB. Thumbnail wajib diisi sebelum project diterbitkan.",
+  removeLabel = "Hapus thumbnail",
+  placeholder = "Belum ada thumbnail",
+  shape = "wide",
 }: ThumbnailUploaderProps) {
   const inputId = useId();
   const newUrlsRef = useRef(new Set<string>());
@@ -90,7 +109,7 @@ export function ThumbnailUploader({
         discardNewUpload(previous);
       }
 
-      const result = await uploadFile(file);
+      const result = await uploadFile(file, scope);
 
       if (!result.ok) {
         setError(result.error);
@@ -116,23 +135,23 @@ export function ThumbnailUploader({
 
   return (
     <div className={styles.uploader}>
-      <div className={styles.thumbnailPreview}>
+      <div className={cn(styles.thumbnailPreview, shape === "square" && styles.profilePreview)}>
         {value ? (
           <Image
             src={value}
-            alt="Pratinjau thumbnail project"
+            alt={previewAlt}
             fill
             sizes="(max-width: 768px) 100vw, 480px"
             className={styles.image}
           />
         ) : (
-          <span className={styles.placeholder}>Belum ada thumbnail</span>
+          <span className={styles.placeholder}>{placeholder}</span>
         )}
       </div>
 
       <div className={styles.controls}>
         <label className={cn(styles.fileButton, busy && styles.fileButtonDisabled)}>
-          {busy ? "Mengunggah…" : value ? "Ganti thumbnail" : "Pilih thumbnail"}
+          {busy ? "Mengunggah…" : value ? `Ganti ${label}` : `Pilih ${label}`}
           <input
             id={inputId}
             type="file"
@@ -159,14 +178,13 @@ export function ThumbnailUploader({
             onClick={handleRemove}
             disabled={busy}
           >
-            Hapus thumbnail
+            {removeLabel}
           </button>
         ) : null}
       </div>
 
       <p id={`${inputId}-hint`} className={styles.hint}>
-        JPEG, PNG, atau WebP. Maksimal 3 MB. Thumbnail wajib diisi sebelum project
-        diterbitkan.
+        {hint}
       </p>
 
       {errorMessage ? (
@@ -177,10 +195,46 @@ export function ThumbnailUploader({
 
       {busy ? (
         <p className={styles.status} role="status">
-          Mengunggah thumbnail…
+          Mengunggah {label}…
         </p>
       ) : null}
     </div>
+  );
+}
+
+type ProfilePhotoUploaderProps = {
+  value: string;
+  onChange: (value: string) => void;
+  error?: string[];
+  onBusyChange?: (busy: boolean) => void;
+  previewAlt?: string;
+  hint?: string;
+  placeholder?: string;
+};
+
+export function ProfilePhotoUploader({
+  value,
+  onChange,
+  error,
+  onBusyChange,
+  previewAlt = "Pratinjau foto profil",
+  hint = "JPEG, PNG, atau WebP. Maksimal 3 MB.",
+  placeholder = "Belum ada foto",
+}: ProfilePhotoUploaderProps) {
+  return (
+    <ThumbnailUploader
+      value={value}
+      onChange={onChange}
+      error={error}
+      onBusyChange={onBusyChange}
+      scope="profiles"
+      label="foto"
+      previewAlt={previewAlt}
+      hint={hint}
+      removeLabel="Hapus foto"
+      placeholder={placeholder}
+      shape="square"
+    />
   );
 }
 
@@ -229,7 +283,7 @@ export function ScreenshotUploader({
           break;
         }
 
-        const result = await uploadFile(file);
+        const result = await uploadFile(file, "projects");
 
         if (!result.ok) {
           setError(result.error);

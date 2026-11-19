@@ -61,6 +61,8 @@ Commands run after the Phase 7 changes:
 | `npm run lint` | Passed. |
 | `npm run build` | Passed. All application routes are dynamic; `/icon.svg` is static. |
 
+> Phase 8 later added 9 PKL validation tests, bringing the current total to 151, plus a GitHub Actions CI workflow.
+
 The first test run used `vitest.config.ts` and emitted a Vite warning about ESM syntax in a CommonJS-loaded config. Renaming it to `vitest.config.mts` removed the warning without changing `package.json` module semantics.
 
 ## Production smoke test
@@ -136,7 +138,7 @@ Pending deployment checks:
 - The `server-only` package is stubbed in tests so pure helpers can be imported in Node. The real package still protects application imports at build time.
 - Production authentication cannot be exercised over plain HTTP localhost because the production cookie is `__Host-kk_session` with `Secure`. Development mode uses `kk_session`.
 - A real Blob upload cannot complete locally because `BLOB_READ_WRITE_TOKEN` is empty.
-- No coverage threshold or CI workflow is configured yet.
+- No coverage threshold is configured. Phase 8 adds the CI workflow.
 
 ## Files added in Phase 7
 

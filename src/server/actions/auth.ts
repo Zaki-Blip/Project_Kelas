@@ -198,6 +198,7 @@ export async function registerAction(
         passwordHash,
         role: Role.USER,
       },
+      select: { id: true },
     });
   } catch (error) {
     if (isUniqueConstraintError(error)) {

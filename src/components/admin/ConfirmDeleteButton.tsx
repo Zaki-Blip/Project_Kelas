@@ -1,23 +1,10 @@
 "use client";
 
-import { useId, useRef, useSyncExternalStore } from "react";
-import { createPortal } from "react-dom";
+import { useId, useRef } from "react";
 
 import { Button } from "@/components/ui/Button";
 import { SubmitButton } from "@/components/ui/SubmitButton";
 import styles from "./ConfirmDeleteButton.module.css";
-
-function subscribeToNothing(): () => void {
-  return () => {};
-}
-
-function getClientSnapshot(): boolean {
-  return true;
-}
-
-function getServerSnapshot(): boolean {
-  return false;
-}
 
 type ConfirmDeleteButtonProps = {
   action: (formData: FormData) => void | Promise<void>;
@@ -41,13 +28,10 @@ export function ConfirmDeleteButton({
   disabledReason,
 }: ConfirmDeleteButtonProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
   const titleId = useId();
   const descriptionId = useId();
-  const mounted = useSyncExternalStore(
-    subscribeToNothing,
-    getClientSnapshot,
-    getServerSnapshot,
-  );
 
   if (disabled) {
     return (
@@ -63,59 +47,88 @@ export function ConfirmDeleteButton({
     );
   }
 
-  const dialog = (
-    <dialog
-      ref={dialogRef}
-      className={styles.dialog}
-      aria-labelledby={titleId}
-      aria-describedby={descriptionId}
-      onClick={(event) => {
-        if (event.target === dialogRef.current) {
-          dialogRef.current?.close();
-        }
-      }}
-    >
-      <h2 id={titleId} className={styles.title}>
-        {title}
-      </h2>
-      <p id={descriptionId} className={styles.text}>
-        {description}
-      </p>
+  function handleDialogClose() {
+    if (triggerRef.current?.isConnected) {
+      triggerRef.current.focus();
+    }
+  }
 
-      <form action={action} className={styles.form}>
-        {Object.entries(fields).map(([name, value]) => (
-          <input key={name} type="hidden" name={name} value={value} />
-        ))}
+  function handleOpen() {
+    const dialog = dialogRef.current;
 
-        <div className={styles.actions}>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => dialogRef.current?.close()}
-          >
-            Batal
-          </Button>
-          <SubmitButton pendingLabel="Menghapus…" variant="danger">
-            {confirmLabel}
-          </SubmitButton>
-        </div>
-      </form>
-    </dialog>
-  );
+    if (dialog && typeof dialog.showModal === "function") {
+      try {
+        dialog.showModal();
+        return;
+      } catch {
+        // Fall back to a native confirmation when the dialog cannot open.
+      }
+    }
+
+    if (window.confirm(`${title}\n\n${description}`)) {
+      const submitButton = formRef.current?.querySelector<HTMLButtonElement>(
+        'button[type="submit"]',
+      );
+      submitButton?.click();
+    }
+  }
 
   return (
     <>
       <button
+        ref={triggerRef}
         type="button"
         className={styles.trigger}
-        onClick={() => dialogRef.current?.showModal()}
+        onClick={handleOpen}
         aria-haspopup="dialog"
         aria-label={title.replace(/\?$/, "")}
       >
         {triggerLabel}
       </button>
 
-      {mounted ? createPortal(dialog, document.body) : null}
+      <dialog
+        ref={dialogRef}
+        className={styles.dialog}
+        aria-modal="true"
+        aria-labelledby={titleId}
+        aria-describedby={descriptionId}
+        onClose={handleDialogClose}
+        onCancel={(event) => {
+          event.preventDefault();
+          dialogRef.current?.close();
+        }}
+        onClick={(event) => {
+          if (event.target === dialogRef.current) {
+            dialogRef.current?.close();
+          }
+        }}
+      >
+        <h2 id={titleId} className={styles.title}>
+          {title}
+        </h2>
+        <p id={descriptionId} className={styles.text}>
+          {description}
+        </p>
+
+        <form ref={formRef} action={action} className={styles.form}>
+          {Object.entries(fields).map(([name, value]) => (
+            <input key={name} type="hidden" name={name} value={value} />
+          ))}
+
+          <div className={styles.actions}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => dialogRef.current?.close()}
+            >
+              Batal
+            </Button>
+            <SubmitButton pendingLabel="Menghapus…" variant="danger">
+              {confirmLabel}
+            </SubmitButton>
+          </div>
+        </form>
+      </dialog>
     </>
   );
 }

@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ConfirmDeleteButton } from "@/components/admin/ConfirmDeleteButton";
 import { SubmitButton } from "@/components/ui/SubmitButton";
 import { cn } from "@/lib/cn";
-import type { PklSubmissionSummary } from "@/lib/pkl/types";
+import type { PklSubmissionListItem } from "@/lib/pkl/types";
 import { isSafeReportUrl } from "@/lib/validation/pkl";
 import {
   deletePklSubmissionAction,
@@ -24,7 +24,7 @@ const statusLabels = {
 } as const;
 
 type PklSubmissionTableProps = {
-  items: PklSubmissionSummary[];
+  items: PklSubmissionListItem[];
   returnTo: string;
 };
 

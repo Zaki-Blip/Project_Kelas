@@ -75,6 +75,7 @@ const projectDetailSelect = {
   githubUrl: true,
   previewUrl: true,
   publishedAt: true,
+  updatedAt: true,
   category: {
     select: {
       name: true,
@@ -139,6 +140,7 @@ function toProjectDetail(row: ProjectDetailRow): ProjectDetailData {
     githubUrl: row.githubUrl,
     previewUrl: row.previewUrl,
     publishedAt: row.publishedAt,
+    updatedAt: row.updatedAt,
     category: row.category,
     creator: row.creator,
     members: row.members.map((member) => member.user),
@@ -161,63 +163,82 @@ export const getProjectDetail = cache(
   },
 );
 
-export async function getLandingProjects(): Promise<ProjectCardData[]> {
-  const rows = await prisma.project.findMany({
-    where: {
+export const getLandingProjects = cache(
+  async (): Promise<ProjectCardData[]> => {
+    const rows = await prisma.project.findMany({
+      where: {
+        status: ProjectStatus.PUBLISHED,
+      },
+      orderBy: [{ publishedAt: "desc" }, { id: "desc" }],
+      take: LANDING_PROJECT_LIMIT,
+      select: projectCardSelect,
+    });
+
+    return rows.map(toProjectCard);
+  },
+);
+
+// Primitive arguments keep the React cache key stable across equivalent filter objects.
+const getGalleryProjectsCached = cache(
+  async (
+    q: string,
+    category: string | undefined,
+    tech: string | undefined,
+    page: number,
+  ): Promise<{ items: ProjectCardData[]; total: number }> => {
+    const where: Prisma.ProjectWhereInput = {
       status: ProjectStatus.PUBLISHED,
-    },
-    orderBy: [{ publishedAt: "desc" }, { id: "desc" }],
-    take: LANDING_PROJECT_LIMIT,
-    select: projectCardSelect,
-  });
+    };
 
-  return rows.map(toProjectCard);
-}
+    if (category) {
+      where.category = { slug: category };
+    }
 
-export async function getGalleryProjects(
+    if (tech) {
+      where.projectTechnologies = {
+        some: {
+          technology: {
+            slug: tech,
+          },
+        },
+      };
+    }
+
+    if (q) {
+      where.OR = [
+        { title: { contains: q } },
+        { creator: { fullName: { contains: q } } },
+        { creator: { username: { contains: q } } },
+      ];
+    }
+
+    const [total, rows] = await prisma.$transaction([
+      prisma.project.count({ where }),
+      prisma.project.findMany({
+        where,
+        orderBy: [{ publishedAt: "desc" }, { id: "desc" }],
+        skip: (page - 1) * GALLERY_PAGE_SIZE,
+        take: GALLERY_PAGE_SIZE,
+        select: projectCardSelect,
+      }),
+    ]);
+
+    return {
+      items: rows.map(toProjectCard),
+      total,
+    };
+  },
+);
+
+export function getGalleryProjects(
   filters: GalleryFilters,
 ): Promise<{ items: ProjectCardData[]; total: number }> {
-  const where: Prisma.ProjectWhereInput = {
-    status: ProjectStatus.PUBLISHED,
-  };
-
-  if (filters.category) {
-    where.category = { slug: filters.category };
-  }
-
-  if (filters.tech) {
-    where.projectTechnologies = {
-      some: {
-        technology: {
-          slug: filters.tech,
-        },
-      },
-    };
-  }
-
-  if (filters.q) {
-    where.OR = [
-      { title: { contains: filters.q } },
-      { creator: { fullName: { contains: filters.q } } },
-      { creator: { username: { contains: filters.q } } },
-    ];
-  }
-
-  const [total, rows] = await prisma.$transaction([
-    prisma.project.count({ where }),
-    prisma.project.findMany({
-      where,
-      orderBy: [{ publishedAt: "desc" }, { id: "desc" }],
-      skip: (filters.page - 1) * GALLERY_PAGE_SIZE,
-      take: GALLERY_PAGE_SIZE,
-      select: projectCardSelect,
-    }),
-  ]);
-
-  return {
-    items: rows.map(toProjectCard),
-    total,
-  };
+  return getGalleryProjectsCached(
+    filters.q,
+    filters.category,
+    filters.tech,
+    filters.page,
+  );
 }
 
 export const getProjectTaxonomies = cache(async () => {

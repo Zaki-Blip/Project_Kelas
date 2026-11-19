@@ -6,7 +6,7 @@ import type { ReactNode } from "react";
 import { Button } from "@/components/ui/Button";
 import { SubmitButton } from "@/components/ui/SubmitButton";
 import { cn } from "@/lib/cn";
-import type { PklSubmissionSummary } from "@/lib/pkl/types";
+import type { PklSubmissionFormData } from "@/lib/pkl/types";
 import { savePklSubmissionAction } from "@/server/actions/pkl";
 import styles from "./PklReportForm.module.css";
 
@@ -23,7 +23,7 @@ const dateFormatter = new Intl.DateTimeFormat("id-ID", {
 });
 
 type PklReportFormProps = {
-  submission: PklSubmissionSummary | null;
+  submission: PklSubmissionFormData | null;
   notice?: string | null;
 };
 

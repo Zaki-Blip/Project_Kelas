@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: karyakelas
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -proot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    env:
+      DATABASE_URL: "mysql://root:root@127.0.0.1:3306/karyakelas"
+      APP_URL: "http://localhost:3000"
+      AUTH_SECRET: "ci-only-secret-at-least-32-bytes-long"
+      BLOB_READ_WRITE_TOKEN: ""
+      PREVIEW_ALLOWED_HOSTS: "*.vercel.app"
+      SEED_ADMIN_NAME: "Admin CI"
+      SEED_ADMIN_USERNAME: "admin"
+      SEED_ADMIN_EMAIL: "admin@example.test"
+      SEED_ADMIN_PASSWORD: "AdminCITest123!"
+      SEED_DEMO_DATA: "false"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Apply database migrations
+        run: npm run db:deploy
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Unit tests
+        run: npm run test
+
+      - name: Production build
+        run: npm run build

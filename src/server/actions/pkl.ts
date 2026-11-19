@@ -75,6 +75,7 @@ export async function savePklSubmissionAction(
         reviewNote: null,
         reviewedAt: null,
       },
+      select: { id: true },
     });
   } catch (error) {
     console.error("Failed to save PKL submission.", error);

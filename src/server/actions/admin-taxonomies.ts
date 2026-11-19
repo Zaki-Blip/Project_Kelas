@@ -118,6 +118,7 @@ export async function createCategoryAction(formData: FormData): Promise<void> {
     } else {
       await prisma.category.create({
         data: { name: data.name, slug: data.slug },
+        select: { id: true },
       });
     }
   } catch (error) {
@@ -174,6 +175,7 @@ export async function updateCategoryAction(formData: FormData): Promise<void> {
       await prisma.category.update({
         where: { id: data.id },
         data: { name: data.name, slug: data.slug },
+        select: { id: true },
       });
     }
   } catch (error) {
@@ -226,7 +228,10 @@ export async function deleteCategoryAction(formData: FormData): Promise<void> {
     } else if (category._count.projects > 0) {
       notice = "taxonomy-in-use";
     } else {
-      await prisma.category.delete({ where: { id: categoryId } });
+      await prisma.category.delete({
+        where: { id: categoryId },
+        select: { id: true },
+      });
     }
   } catch (error) {
     notice = noticeForError(error);
@@ -276,6 +281,7 @@ export async function createTechnologyAction(formData: FormData): Promise<void> 
     } else {
       await prisma.technology.create({
         data: { name: data.name, slug: data.slug },
+        select: { id: true },
       });
     }
   } catch (error) {
@@ -332,6 +338,7 @@ export async function updateTechnologyAction(formData: FormData): Promise<void> 
       await prisma.technology.update({
         where: { id: data.id },
         data: { name: data.name, slug: data.slug },
+        select: { id: true },
       });
     }
   } catch (error) {
@@ -384,7 +391,10 @@ export async function deleteTechnologyAction(formData: FormData): Promise<void> 
     } else if (technology._count.projectTechnologies > 0) {
       notice = "taxonomy-in-use";
     } else {
-      await prisma.technology.delete({ where: { id: technologyId } });
+      await prisma.technology.delete({
+        where: { id: technologyId },
+        select: { id: true },
+      });
     }
   } catch (error) {
     notice = noticeForError(error);

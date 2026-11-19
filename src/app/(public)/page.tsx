@@ -1,14 +1,49 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 
 import { ProjectGrid } from "@/components/projects/ProjectGrid";
 import { ProjectGridSkeleton } from "@/components/projects/ProjectGridSkeleton";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { Button } from "@/components/ui/Button";
+import { LoadingStatus } from "@/components/ui/LoadingStatus";
 import { getCurrentUser } from "@/lib/auth/session";
 import { cn } from "@/lib/cn";
 import { getLandingProjects } from "@/lib/projects/queries";
 import { getLoginNextHref } from "@/lib/projects/urls";
+import {
+  absoluteUrl,
+  DEFAULT_OG_IMAGE,
+  SITE_DESCRIPTION,
+  SITE_NAME,
+  SITE_URL,
+} from "@/lib/seo";
 import styles from "./home.module.css";
+
+export const metadata: Metadata = {
+  title: { absolute: "KaryaKelas — Katalog Karya Kelas" },
+  description: SITE_DESCRIPTION,
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    type: "website",
+    locale: "id_ID",
+    url: "/",
+    siteName: SITE_NAME,
+    title: "KaryaKelas — Katalog Karya Kelas",
+    description:
+      "Katalog proyek hasil karya siswa XII RPL 1: temukan karya, lihat profil kelas, dan coba pratinjau langsung.",
+    images: [DEFAULT_OG_IMAGE],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "KaryaKelas — Katalog Karya Kelas",
+    description:
+      "Katalog proyek hasil karya siswa XII RPL 1: temukan karya, lihat profil kelas, dan coba pratinjau langsung.",
+    images: [DEFAULT_OG_IMAGE],
+  },
+};
 
 const features = [
   {
@@ -50,18 +85,38 @@ function LatestProjectsHeading({ isAuthenticated }: { isAuthenticated: boolean }
 
 async function LatestProjects({ isAuthenticated }: { isAuthenticated: boolean }) {
   const projects = await getLandingProjects();
+  const collectionJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: "Karya terbaru KaryaKelas",
+    url: absoluteUrl("/#karya-terbaru"),
+    isPartOf: { "@id": `${SITE_URL.toString()}#website` },
+    mainEntity: {
+      "@type": "ItemList",
+      numberOfItems: projects.length,
+      itemListElement: projects.map((project, index) => ({
+        "@type": "ListItem",
+        position: index + 1,
+        name: project.title,
+        url: absoluteUrl(`/projects/${project.slug}`),
+      })),
+    },
+  };
 
   return (
-    <section id="karya-terbaru" className={styles.latest}>
-      <div className="container">
-        <LatestProjectsHeading isAuthenticated={isAuthenticated} />
-        {projects.length > 0 ? (
-          <ProjectGrid projects={projects} isAuthenticated={isAuthenticated} />
-        ) : (
-          <p className={styles.latestEmpty}>Belum ada karya yang dipublikasikan.</p>
-        )}
-      </div>
-    </section>
+    <>
+      <JsonLd data={collectionJsonLd} />
+      <section id="karya-terbaru" className={styles.latest}>
+        <div className="container">
+          <LatestProjectsHeading isAuthenticated={isAuthenticated} />
+          {projects.length > 0 ? (
+            <ProjectGrid projects={projects} isAuthenticated={isAuthenticated} />
+          ) : (
+            <p className={styles.latestEmpty}>Belum ada karya yang dipublikasikan.</p>
+          )}
+        </div>
+      </section>
+    </>
   );
 }
 
@@ -70,7 +125,7 @@ function LatestProjectsFallback({ isAuthenticated }: { isAuthenticated: boolean 
     <section className={styles.latest} aria-busy="true">
       <div className="container">
         <LatestProjectsHeading isAuthenticated={isAuthenticated} />
-        <span className="visuallyHidden">Memuat karya terbaru…</span>
+        <LoadingStatus label="Memuat karya terbaru…" />
         <ProjectGridSkeleton count={6} />
       </div>
     </section>
@@ -79,9 +134,39 @@ function LatestProjectsFallback({ isAuthenticated }: { isAuthenticated: boolean 
 
 export default async function HomePage() {
   const user = await getCurrentUser();
+  const siteJsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": `${SITE_URL.toString()}#website`,
+        name: SITE_NAME,
+        url: SITE_URL.toString(),
+        description: SITE_DESCRIPTION,
+        inLanguage: "id-ID",
+        publisher: { "@id": `${SITE_URL.toString()}#organization` },
+        potentialAction: {
+          "@type": "SearchAction",
+          target: `${absoluteUrl("/dashboard")}?q={search_term_string}`,
+          "query-input": "required name=search_term_string",
+        },
+      },
+      {
+        "@type": "EducationalOrganization",
+        "@id": `${SITE_URL.toString()}#organization`,
+        name: SITE_NAME,
+        alternateName: "XII RPL 1",
+        url: SITE_URL.toString(),
+        logo: absoluteUrl("/icons/icon-512.png"),
+        description:
+          "Katalog proyek siswa XII RPL 1 untuk melihat, mencari, dan mencoba karya kelas.",
+      },
+    ],
+  };
 
   return (
     <>
+      <JsonLd data={siteJsonLd} />
       <section className={styles.hero}>
         <div className={cn("container", styles.heroGrid)}>
           <div className={styles.copy}>

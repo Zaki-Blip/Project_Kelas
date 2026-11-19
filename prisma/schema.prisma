@@ -39,7 +39,7 @@ model User {
   sessions           Session[]
   pklSubmission      PklSubmission?
 
-  @@index([fullName])
+  @@index([fullName, username])
   @@map("users")
 }
 
@@ -120,14 +120,13 @@ model Project {
   images              ProjectImage[]
   projectTechnologies ProjectTechnology[]
 
-  @@index([status])
   @@index([categoryId])
   @@index([creatorId])
   @@index([title])
-  @@index([publishedAt])
-  @@index([status, publishedAt])
-  @@index([status, categoryId])
+  @@index([status, publishedAt, id])
+  @@index([status, categoryId, publishedAt, id])
   @@index([status, creatorId])
+  @@index([updatedAt, id])
   @@map("projects")
 }
 
@@ -188,7 +187,37 @@ model PklSubmission {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([status, createdAt])
-  @@index([createdAt])
+  @@index([updatedAt, id])
   @@map("pkl_submissions")
+}
+
+model ClassProfile {
+  id          Int     @id @default(1)
+  className   String  @map("class_name") @db.VarChar(80)
+  tagline     String? @db.VarChar(120)
+  description String? @db.Text
+  photoPath   String? @map("photo_path") @db.VarChar(2048)
+
+  createdAt DateTime @default(now()) @map("created_at") @db.DateTime(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.DateTime(3)
+
+  @@map("class_profiles")
+}
+
+model StudentProfile {
+  id           String  @id @default(cuid()) @db.VarChar(30)
+  name         String  @db.VarChar(80)
+  role         String? @db.VarChar(80)
+  bio          String? @db.Text
+  photoPath    String  @map("photo_path") @db.VarChar(2048)
+  socialLinks  String? @map("social_links") @db.Text
+  sortOrder    Int     @default(0) @map("sort_order")
+  isVisible    Boolean @default(true) @map("is_visible")
+
+  createdAt DateTime @default(now()) @map("created_at") @db.DateTime(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.DateTime(3)
+
+  @@index([isVisible, sortOrder, name])
+  @@index([sortOrder, name])
+  @@map("student_profiles")
 }

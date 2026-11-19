@@ -351,3 +351,91 @@
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
+
+@media print {
+  .page {
+    padding: 0;
+  }
+
+  .backNav,
+  .actions,
+  .hint,
+  .footerNav {
+    display: none !important;
+  }
+
+  .article {
+    gap: 18pt;
+  }
+
+  .hero {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12pt;
+    break-inside: avoid;
+  }
+
+  .media {
+    border: 0;
+    box-shadow: none;
+  }
+
+  .meta {
+    break-inside: avoid;
+  }
+
+  .image {
+    max-height: 70mm;
+    aspect-ratio: auto;
+    object-fit: contain;
+  }
+
+  .title {
+    font-size: 26pt;
+  }
+
+  .summary {
+    font-size: 11pt;
+  }
+
+  .section {
+    padding-top: 12pt;
+  }
+
+  .sectionTitle {
+    font-size: 16pt;
+  }
+
+  .description {
+    font-size: 11pt;
+  }
+
+  .member,
+  .screenshot {
+    box-shadow: none;
+    break-inside: avoid;
+  }
+
+  .screenshotGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8pt;
+  }
+
+  .screenshotImage {
+    max-height: 70mm;
+    aspect-ratio: auto;
+    object-fit: contain;
+  }
+
+  .technology,
+  .category,
+  .draft {
+    border: 1px solid #111111;
+    box-shadow: none;
+  }
+
+  a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 9pt;
+    word-break: break-all;
+  }
+}

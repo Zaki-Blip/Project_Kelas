@@ -15,6 +15,13 @@ import styles from "./dashboard.module.css";
 export const metadata: Metadata = {
   title: "Galeri",
   description: "Jelajahi karya kelas, cari berdasarkan judul atau pembuat, dan filter kategori.",
+  alternates: {
+    canonical: "/dashboard",
+  },
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;

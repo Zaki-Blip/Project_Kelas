@@ -21,7 +21,7 @@ export default async function AdminLayout({ children }: { children: ReactNode })
 
   return (
     <div className={styles.shell}>
-      <AdminNav />
+      <AdminNav pathname={pathname.split(/[?#]/)[0] ?? "/admin"} />
       <div className={styles.content}>{children}</div>
     </div>
   );

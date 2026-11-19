@@ -1,5 +1,6 @@
 const BLOB_HOST_SUFFIX = ".public.blob.vercel-storage.com";
-const SEED_IMAGE_PATH = /^\/seed\/(?:thumbnails|screenshots)\/[a-z0-9-]+\.(?:png|jpe?g|webp)$/i;
+const SEED_IMAGE_PATH =
+  /^\/seed\/(?:thumbnails|screenshots|profiles)\/[a-z0-9-]+\.(?:png|jpe?g|webp)$/i;
 
 /**
  * Returns true only for HTTPS Vercel Blob public URLs. Credentials and custom

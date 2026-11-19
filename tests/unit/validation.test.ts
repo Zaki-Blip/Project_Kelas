@@ -17,6 +17,10 @@ import {
   pklSubmissionSchema,
 } from "@/lib/validation/pkl";
 import {
+  classProfileFormSchema,
+  studentProfileFormSchema,
+} from "@/lib/validation/profiles";
+import {
   parseGallerySearchParams,
   parseProjectSlug,
 } from "@/lib/validation/projects";
@@ -445,6 +449,7 @@ describe("projectFormSchema", () => {
       "/seed/screenshots/kasir-kita-1.jpg",
       "/seed/screenshots/kasir-kita-1.jpeg",
       "/seed/screenshots/kasir-kita-1.webp",
+      "/seed/profiles/budi.png",
       "https://abc123.public.blob.vercel-storage.com/projects/a/b.png",
     ];
 
@@ -826,5 +831,459 @@ describe("parseAdminId", () => {
     expect(parseAdminId("")).toBeNull();
     expect(parseAdminId("   ")).toBeNull();
     expect(parseAdminId("a".repeat(31))).toBeNull();
+  });
+});
+
+describe("isSafeReportUrl", () => {
+  it("accepts clean HTTPS report links", () => {
+    expect(
+      isSafeReportUrl("https://drive.google.com/file/d/abc/view"),
+    ).toBe(true);
+    expect(isSafeReportUrl("https://example.com/laporan-pkl.pdf")).toBe(true);
+    expect(isSafeReportUrl("  https://onedrive.live.com/report  ")).toBe(true);
+    expect(isSafeReportUrl("https://example.com:443/laporan.pdf")).toBe(true);
+  });
+
+  it("rejects non-HTTPS, credentialed, or custom-port URLs", () => {
+    const invalid = [
+      "http://example.com/laporan.pdf",
+      "https://user:pass@example.com/laporan.pdf",
+      "https://example.com:8443/laporan.pdf",
+      "javascript:alert(1)",
+      "data:text/html,hello",
+      "",
+    ];
+
+    for (const value of invalid) {
+      expect(isSafeReportUrl(value)).toBe(false);
+    }
+  });
+
+  it("rejects local hosts and hostnames without a dot", () => {
+    expect(isSafeReportUrl("https://localhost/laporan.pdf")).toBe(false);
+    expect(isSafeReportUrl("https://app.localhost/laporan.pdf")).toBe(false);
+    expect(isSafeReportUrl("https://internal/laporan.pdf")).toBe(false);
+  });
+
+  it("rejects URLs longer than 2048 characters", () => {
+    expect(
+      isSafeReportUrl(`https://example.com/${"a".repeat(2048)}`),
+    ).toBe(false);
+  });
+});
+
+describe("pklSubmissionSchema", () => {
+  function validSubmission() {
+    return {
+      title: "Laporan PKL di PT Contoh Teknologi",
+      company: "PT Contoh Teknologi",
+      summary:
+        "Selama PKL saya mengerjakan modul administrasi dan membantu pengujian aplikasi.",
+      reportUrl: "https://drive.google.com/file/d/abc/view",
+    };
+  }
+
+  it("accepts and trims a valid submission", () => {
+    const result = pklSubmissionSchema.safeParse({
+      title: "  Laporan PKL di PT Contoh Teknologi  ",
+      company: "  PT Contoh Teknologi  ",
+      summary: `  ${validSubmission().summary}  `,
+      reportUrl: "  https://drive.google.com/file/d/abc/view  ",
+    });
+
+    expect(result.success).toBe(true);
+
+    if (result.success) {
+      expect(result.data.title).toBe("Laporan PKL di PT Contoh Teknologi");
+      expect(result.data.company).toBe("PT Contoh Teknologi");
+      expect(result.data.reportUrl).toBe(
+        "https://drive.google.com/file/d/abc/view",
+      );
+    }
+  });
+
+  it("validates title, company, and summary lengths", () => {
+    const cases = [
+      {
+        input: { title: "PKL" },
+        field: "title" as const,
+        message: "Judul laporan minimal 5 karakter.",
+      },
+      {
+        input: { title: "a".repeat(161) },
+        field: "title" as const,
+        message: "Judul laporan maksimal 160 karakter.",
+      },
+      {
+        input: { company: "A" },
+        field: "company" as const,
+        message: "Tempat PKL minimal 2 karakter.",
+      },
+      {
+        input: { company: "a".repeat(121) },
+        field: "company" as const,
+        message: "Tempat PKL maksimal 120 karakter.",
+      },
+      {
+        input: { summary: "terlalu pendek" },
+        field: "summary" as const,
+        message: "Ringkasan minimal 20 karakter.",
+      },
+      {
+        input: { summary: "a".repeat(2001) },
+        field: "summary" as const,
+        message: "Ringkasan maksimal 2000 karakter.",
+      },
+    ];
+
+    for (const { input, field, message } of cases) {
+      const result = pklSubmissionSchema.safeParse({
+        ...validSubmission(),
+        ...input,
+      });
+
+      expect(result.success).toBe(false);
+
+      if (!result.success) {
+        expect(result.error.flatten().fieldErrors[field]).toContain(message);
+      }
+    }
+  });
+
+  it("rejects an unsafe report URL", () => {
+    const result = pklSubmissionSchema.safeParse({
+      ...validSubmission(),
+      reportUrl: "http://example.com/laporan.pdf",
+    });
+
+    expect(result.success).toBe(false);
+
+    if (!result.success) {
+      expect(result.error.flatten().fieldErrors.reportUrl).toContain(
+        "Gunakan URL HTTPS yang valid tanpa port khusus.",
+      );
+    }
+  });
+});
+
+describe("classProfileFormSchema", () => {
+  function validClassProfile() {
+    return {
+      className: "XII RPL 1",
+      tagline: "Kelas yang bikin ide jadi karya.",
+      description:
+        "Kami belajar membangun aplikasi, bekerja dalam tim, dan menyajikan karya.",
+      photoPath: "/seed/profiles/class.png",
+    };
+  }
+
+  it("accepts a complete class profile and trims values", () => {
+    const result = classProfileFormSchema.safeParse({
+      ...validClassProfile(),
+      className: "  XII RPL 1  ",
+      tagline: "  Kelas yang bikin ide jadi karya.  ",
+    });
+
+    expect(result.success).toBe(true);
+
+    if (result.success) {
+      expect(result.data.className).toBe("XII RPL 1");
+      expect(result.data.tagline).toBe("Kelas yang bikin ide jadi karya.");
+    }
+  });
+
+  it("accepts empty optional fields", () => {
+    const result = classProfileFormSchema.safeParse({
+      className: "XII RPL 1",
+      tagline: "",
+      description: "",
+      photoPath: "",
+    });
+
+    expect(result.success).toBe(true);
+  });
+
+  it("validates class name, tagline, and description lengths", () => {
+    const cases = [
+      {
+        input: { className: "A" },
+        field: "className" as const,
+        message: "Nama kelas minimal 2 karakter.",
+      },
+      {
+        input: { className: "a".repeat(81) },
+        field: "className" as const,
+        message: "Nama kelas maksimal 80 karakter.",
+      },
+      {
+        input: { tagline: "a".repeat(121) },
+        field: "tagline" as const,
+        message: "Tagline maksimal 120 karakter.",
+      },
+      {
+        input: { description: "a".repeat(1001) },
+        field: "description" as const,
+        message: "Deskripsi maksimal 1000 karakter.",
+      },
+    ];
+
+    for (const { input, field, message } of cases) {
+      const result = classProfileFormSchema.safeParse({
+        ...validClassProfile(),
+        ...input,
+      });
+
+      expect(result.success).toBe(false);
+
+      if (!result.success) {
+        expect(result.error.flatten().fieldErrors[field]).toContain(message);
+      }
+    }
+  });
+
+  it("rejects unsafe photos", () => {
+    const photo = classProfileFormSchema.safeParse({
+      ...validClassProfile(),
+      photoPath: "https://evil.com/class.png",
+    });
+
+    expect(photo.success).toBe(false);
+
+    if (!photo.success) {
+      expect(photo.error.flatten().fieldErrors.photoPath).toContain(
+        "Gambar tidak valid. Unggah ulang gambar.",
+      );
+    }
+  });
+});
+
+describe("studentProfileFormSchema", () => {
+  function validStudentProfile() {
+    return {
+      studentId: "",
+      name: "Budi Santoso",
+      role: "Ketua Kelas",
+      bio: "Suka membangun aplikasi web.",
+      photoPath: "/seed/profiles/budi.png",
+      socialLinks: [
+        "https://www.tiktok.com/@budi",
+        "https://www.instagram.com/budi.santoso",
+        "https://github.com/budi-santoso",
+      ].join("\n"),
+      sortOrder: "1",
+      isVisible: true,
+    };
+  }
+
+  it("accepts a valid student profile", () => {
+    const result = studentProfileFormSchema.safeParse(validStudentProfile());
+
+    expect(result.success).toBe(true);
+
+    if (result.success) {
+      expect(result.data.sortOrder).toBe(1);
+      expect(result.data.isVisible).toBe(true);
+      expect(result.data.socialLinks.split("\n")).toHaveLength(3);
+    }
+  });
+
+  it("accepts an empty social links field", () => {
+    const result = studentProfileFormSchema.safeParse({
+      ...validStudentProfile(),
+      socialLinks: "   ",
+    });
+
+    expect(result.success).toBe(true);
+
+    if (result.success) {
+      expect(result.data.socialLinks).toBe("");
+    }
+  });
+
+  it("requires a valid photo", () => {
+    const missing = studentProfileFormSchema.safeParse({
+      ...validStudentProfile(),
+      photoPath: "",
+    });
+    const invalid = studentProfileFormSchema.safeParse({
+      ...validStudentProfile(),
+      photoPath: "https://evil.com/budi.png",
+    });
+
+    expect(missing.success).toBe(false);
+    expect(invalid.success).toBe(false);
+
+    if (!missing.success) {
+      expect(missing.error.flatten().fieldErrors.photoPath).toContain(
+        "Foto wajib diunggah.",
+      );
+    }
+
+    if (!invalid.success) {
+      expect(invalid.error.flatten().fieldErrors.photoPath).toContain(
+        "Foto tidak valid. Unggah ulang gambar.",
+      );
+    }
+  });
+
+  it("validates name, role, and bio lengths", () => {
+    const cases = [
+      {
+        input: { name: "A" },
+        field: "name" as const,
+        message: "Nama siswa minimal 2 karakter.",
+      },
+      {
+        input: { name: "a".repeat(81) },
+        field: "name" as const,
+        message: "Nama siswa maksimal 80 karakter.",
+      },
+      {
+        input: { role: "a".repeat(81) },
+        field: "role" as const,
+        message: "Peran maksimal 80 karakter.",
+      },
+      {
+        input: { bio: "a".repeat(501) },
+        field: "bio" as const,
+        message: "Bio maksimal 500 karakter.",
+      },
+    ];
+
+    for (const { input, field, message } of cases) {
+      const result = studentProfileFormSchema.safeParse({
+        ...validStudentProfile(),
+        ...input,
+      });
+
+      expect(result.success).toBe(false);
+
+      if (!result.success) {
+        expect(result.error.flatten().fieldErrors[field]).toContain(message);
+      }
+    }
+  });
+
+  it("validates the sort order and visibility", () => {
+    const negative = studentProfileFormSchema.safeParse({
+      ...validStudentProfile(),
+      sortOrder: "-1",
+    });
+    const tooHigh = studentProfileFormSchema.safeParse({
+      ...validStudentProfile(),
+      sortOrder: "1000",
+    });
+    const decimal = studentProfileFormSchema.safeParse({
+      ...validStudentProfile(),
+      sortOrder: "1.5",
+    });
+    const notBoolean = studentProfileFormSchema.safeParse({
+      ...validStudentProfile(),
+      isVisible: "true",
+    });
+
+    expect(negative.success).toBe(false);
+    expect(tooHigh.success).toBe(false);
+    expect(decimal.success).toBe(false);
+    expect(notBoolean.success).toBe(false);
+  });
+
+  it("normalizes, trims, and deduplicates social links", () => {
+    const result = studentProfileFormSchema.safeParse({
+      ...validStudentProfile(),
+      socialLinks:
+        "  https://www.instagram.com/budi  \n\nhttps://github.com/budi\nhttps://www.instagram.com/budi\n",
+    });
+
+    expect(result.success).toBe(true);
+
+    if (result.success) {
+      expect(result.data.socialLinks).toBe(
+        "https://www.instagram.com/budi\nhttps://github.com/budi",
+      );
+    }
+  });
+
+  it("accepts arbitrary HTTPS social platforms", () => {
+    const result = studentProfileFormSchema.safeParse({
+      ...validStudentProfile(),
+      socialLinks:
+        "https://www.linkedin.com/in/budi\nhttps://kelas.example.com/budi",
+    });
+
+    expect(result.success).toBe(true);
+  });
+
+  it("rejects unsafe social links", () => {
+    const invalid = [
+      "http://www.instagram.com/budi",
+      "https://user:pass@linkedin.com/in/budi",
+      "https://linkedin.com:8443/in/budi",
+      "https://localhost/budi",
+      "https://intranet/budi",
+    ];
+
+    for (const socialLinks of invalid) {
+      const result = studentProfileFormSchema.safeParse({
+        ...validStudentProfile(),
+        socialLinks,
+      });
+
+      expect(result.success).toBe(false);
+
+      if (!result.success) {
+        expect(result.error.flatten().fieldErrors.socialLinks).toContain(
+          "Gunakan URL HTTPS yang valid tanpa kredensial atau port khusus.",
+        );
+      }
+    }
+  });
+
+  it("caps social links at five", () => {
+    const result = studentProfileFormSchema.safeParse({
+      ...validStudentProfile(),
+      socialLinks: Array.from(
+        { length: 6 },
+        (_, index) => `https://example.com/${index + 1}`,
+      ).join("\n"),
+    });
+
+    expect(result.success).toBe(false);
+
+    if (!result.success) {
+      expect(result.error.flatten().fieldErrors.socialLinks).toContain(
+        "Maksimal 5 tautan sosial.",
+      );
+    }
+  });
+});
+
+describe("pklReviewSchema", () => {
+  it("accepts valid statuses and defaults an empty note", () => {
+    const result = pklReviewSchema.safeParse({
+      submissionId: "pkl_1",
+      status: "REVIEWED",
+    });
+
+    expect(result.success).toBe(true);
+
+    if (result.success) {
+      expect(result.data.reviewNote).toBe("");
+    }
+  });
+
+  it("rejects an unknown status or overlong note", () => {
+    const invalidStatus = pklReviewSchema.safeParse({
+      submissionId: "pkl_1",
+      status: "APPROVED",
+    });
+    const longNote = pklReviewSchema.safeParse({
+      submissionId: "pkl_1",
+      status: "REVISION",
+      reviewNote: "a".repeat(1001),
+    });
+
+    expect(invalidStatus.success).toBe(false);
+    expect(longNote.success).toBe(false);
   });
 });

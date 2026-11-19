@@ -257,3 +257,59 @@ textarea.input {
     transition: none;
   }
 }
+
+@media print {
+  .layout {
+    display: block;
+    margin-top: 12pt;
+  }
+
+  .card {
+    padding: 0;
+    border: 0;
+    box-shadow: none;
+  }
+
+  .side,
+  .actions,
+  .notice,
+  .hint,
+  .error,
+  .alert,
+  .readOnly {
+    display: none !important;
+  }
+
+  .form {
+    gap: 10pt;
+    margin-top: 12pt;
+  }
+
+  .field {
+    break-inside: avoid;
+  }
+
+  .input {
+    min-height: 0;
+    padding: 0 0 4pt;
+    border: 0;
+    border-bottom: 1px solid #111111;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    font-size: 11pt;
+  }
+
+  textarea.input {
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+    resize: none;
+    field-sizing: content;
+  }
+
+  .badge {
+    border: 1px solid #111111;
+    box-shadow: none;
+  }
+}

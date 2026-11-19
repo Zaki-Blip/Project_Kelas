@@ -1,7 +1,4 @@
-"use client";
-
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 
 import { cn } from "@/lib/cn";
 import styles from "./AdminNav.module.css";
@@ -29,15 +26,22 @@ const navItems = [
     isActive: (pathname: string) => pathname.startsWith("/admin/laporan-pkl"),
   },
   {
+    href: "/admin/profil-kelas",
+    label: "Profil Kelas",
+    isActive: (pathname: string) => pathname.startsWith("/admin/profil-kelas"),
+  },
+  {
     href: "/",
     label: "Lihat Situs",
     isActive: () => false,
   },
 ] as const;
 
-export function AdminNav() {
-  const pathname = usePathname();
+type AdminNavProps = {
+  pathname: string;
+};
 
+export function AdminNav({ pathname }: AdminNavProps) {
   return (
     <nav className={styles.nav} aria-label="Navigasi panel pengelola">
       <div className={cn("container", styles.inner)}>

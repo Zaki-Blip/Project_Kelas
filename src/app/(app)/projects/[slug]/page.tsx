@@ -3,13 +3,16 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { JsonLd } from "@/components/seo/JsonLd";
 import { Button } from "@/components/ui/Button";
 import { requireUser } from "@/lib/auth/guards";
 import { getSession } from "@/lib/auth/session";
 import { cn } from "@/lib/cn";
 import { getProjectDetail } from "@/lib/projects/queries";
 import { getProjectPreviewHref } from "@/lib/projects/urls";
+import { isAllowedImagePath } from "@/lib/security/images";
 import { getGitHubUrl, getPreviewUrl } from "@/lib/security/urls";
+import { absoluteUrl, DEFAULT_OG_IMAGE, SITE_NAME, SITE_URL } from "@/lib/seo";
 import { parseProjectSlug } from "@/lib/validation/projects";
 import styles from "./project-detail.module.css";
 
@@ -40,12 +43,56 @@ export async function generateMetadata({ params }: ProjectPageProps): Promise<Me
   const project = await getProjectDetail(slug, session.user.role);
 
   if (!project) {
-    return { title: "Proyek tidak ditemukan" };
+    return {
+      title: "Proyek tidak ditemukan",
+      robots: { index: false, follow: false },
+    };
   }
+
+  const canonical = `/projects/${project.slug}`;
+  const thumbnailPath =
+    project.thumbnailPath && isAllowedImagePath(project.thumbnailPath)
+      ? project.thumbnailPath
+      : null;
+  const ogImages = thumbnailPath
+    ? [
+        {
+          url: thumbnailPath,
+          alt: `Tampilan ${project.title}`,
+        },
+      ]
+    : [DEFAULT_OG_IMAGE];
 
   return {
     title: project.title,
     description: project.summary,
+    alternates: {
+      canonical,
+    },
+    robots: {
+      index: false,
+      follow: false,
+    },
+    openGraph: {
+      type: "article",
+      url: canonical,
+      title: project.title,
+      description: project.summary,
+      ...(project.publishedAt
+        ? { publishedTime: project.publishedAt.toISOString() }
+        : {}),
+      modifiedTime: project.updatedAt.toISOString(),
+      authors: [project.creator.fullName],
+      section: project.category.name,
+      tags: project.technologies.map((technology) => technology.name),
+      images: ogImages,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: project.title,
+      description: project.summary,
+      images: ogImages,
+    },
   };
 }
 
@@ -72,9 +119,83 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
     .split(/\n{2,}/)
     .map((paragraph) => paragraph.trim())
     .filter((paragraph) => paragraph.length > 0);
+  const thumbnailPath =
+    project.thumbnailPath && isAllowedImagePath(project.thumbnailPath)
+      ? project.thumbnailPath
+      : null;
+  const screenshots = project.images.filter((image) =>
+    isAllowedImagePath(image.imagePath),
+  );
+  const projectUrl = absoluteUrl(`/projects/${project.slug}`);
+  const projectJsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "CreativeWork",
+        "@id": `${projectUrl}#creativework`,
+        name: project.title,
+        description: project.summary,
+        url: projectUrl,
+        ...(thumbnailPath ? { image: absoluteUrl(thumbnailPath) } : {}),
+        ...(project.publishedAt
+          ? { datePublished: project.publishedAt.toISOString() }
+          : {}),
+        dateModified: project.updatedAt.toISOString(),
+        author: {
+          "@type": "Person",
+          name: project.creator.fullName,
+          alternateName: `@${project.creator.username}`,
+        },
+        contributor: project.members.map((member) => ({
+          "@type": "Person",
+          name: member.fullName,
+          alternateName: `@${member.username}`,
+        })),
+        genre: project.category.name,
+        keywords: project.technologies.map((technology) => technology.name).join(", "),
+        about: project.technologies.map((technology) => ({
+          "@type": "Thing",
+          name: technology.name,
+        })),
+        publisher: {
+          "@type": "EducationalOrganization",
+          "@id": `${SITE_URL.toString()}#organization`,
+          name: SITE_NAME,
+          url: SITE_URL.toString(),
+        },
+        isPartOf: { "@id": `${SITE_URL.toString()}#website` },
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": `${projectUrl}#breadcrumb`,
+        itemListElement: [
+          {
+            "@type": "ListItem",
+            position: 1,
+            name: "Beranda",
+            item: absoluteUrl("/"),
+          },
+          {
+            "@type": "ListItem",
+            position: 2,
+            name: "Galeri",
+            item: absoluteUrl("/dashboard"),
+          },
+          {
+            "@type": "ListItem",
+            position: 3,
+            name: project.title,
+            item: projectUrl,
+          },
+        ],
+      },
+    ],
+  };
 
   return (
-    <section className={cn("container", styles.page)}>
+    <>
+      <JsonLd data={projectJsonLd} />
+      <section className={cn("container", styles.page)}>
       <nav className={styles.backNav} aria-label="Navigasi proyek">
         <Link href="/dashboard" className={styles.backLink}>
           <span aria-hidden="true">←</span>
@@ -85,9 +206,9 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
       <article className={styles.article}>
         <div className={styles.hero}>
           <div className={styles.media}>
-            {project.thumbnailPath ? (
+            {thumbnailPath ? (
               <Image
-                src={project.thumbnailPath}
+                src={thumbnailPath}
                 alt={`Tampilan ${project.title}`}
                 width={960}
                 height={600}
@@ -214,9 +335,9 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
           <h2 id="screenshot-proyek" className={styles.sectionTitle}>
             Screenshot
           </h2>
-          {project.images.length > 0 ? (
+          {screenshots.length > 0 ? (
             <div className={styles.screenshotGrid}>
-              {project.images.map((image, index) => (
+              {screenshots.map((image, index) => (
                 <figure key={image.id} className={styles.screenshot}>
                   <Image
                     src={image.imagePath}
@@ -243,6 +364,7 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
           Kembali ke Galeri
         </Button>
       </div>
-    </section>
+      </section>
+    </>
   );
 }

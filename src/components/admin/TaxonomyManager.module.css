@@ -128,6 +128,8 @@
 }
 
 .tableWrap {
+  max-width: 100%;
+  min-width: 0;
   overflow-x: auto;
   border: var(--border);
   border-radius: var(--radius-lg);

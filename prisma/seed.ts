@@ -3,7 +3,12 @@ import "dotenv/config";
 import { randomBytes } from "node:crypto";
 
 import { hash } from "@node-rs/argon2";
-import { PrismaClient, ProjectStatus, Role } from "../src/generated/prisma/client";
+import {
+  PklStatus,
+  PrismaClient,
+  ProjectStatus,
+  Role,
+} from "../src/generated/prisma/client";
 import { createPrismaAdapter } from "../src/lib/prisma-adapter";
 
 // @node-rs/argon2 defaults to Argon2id, which is the algorithm we want here.
@@ -468,7 +473,161 @@ async function main() {
     });
   }
 
+  const demoPklSubmissions = [
+    {
+      user: "budi",
+      title: "Laporan PKL di PT Contoh Teknologi",
+      company: "PT Contoh Teknologi",
+      summary:
+        "Selama PKL saya membantu tim pengembang menyusun modul administrasi, menguji alur aplikasi, dan mendokumentasikan hasil pekerjaan.",
+      reportUrl: "https://drive.google.com/file/d/demo-budi/view",
+      status: PklStatus.SUBMITTED,
+      reviewNote: null,
+      reviewedAt: null,
+    },
+    {
+      user: "sari",
+      title: "Laporan PKL di CV Karya Digital",
+      company: "CV Karya Digital",
+      summary:
+        "Selama PKL saya terlibat dalam pembuatan antarmuka web, pengelolaan konten, dan pengujian tampilan pada beberapa ukuran layar.",
+      reportUrl: "https://drive.google.com/file/d/demo-sari/view",
+      status: PklStatus.REVIEWED,
+      reviewNote: "Laporan sudah lengkap. Pertahankan kualitas dokumentasinya.",
+      reviewedAt: new Date("2026-11-10T09:00:00.000Z"),
+    },
+  ];
+
+  for (const submission of demoPklSubmissions) {
+    const userId = demoUserIds.get(submission.user);
+
+    if (!userId) {
+      throw new Error(`Missing user for PKL submission ${submission.user}.`);
+    }
+
+    const data = {
+      title: submission.title,
+      company: submission.company,
+      summary: submission.summary,
+      reportUrl: submission.reportUrl,
+      status: submission.status,
+      reviewNote: submission.reviewNote,
+      reviewedAt: submission.reviewedAt,
+    };
+
+    await prisma.pklSubmission.upsert({
+      where: { userId },
+      create: { userId, ...data },
+      update: data,
+    });
+  }
+
+  const demoClassProfile = {
+    className: "XII RPL 1",
+    tagline: "Kelas yang bikin ide jadi karya.",
+    description:
+      "Kami adalah kelas XII RPL 1, tempat siswa belajar membangun aplikasi, memecahkan masalah, dan bekerja dalam tim.\n\nHalaman ini merangkum cerita kelas dan wajah-wajah di balik karya yang kami buat. Sentuh atau klik foto siswa untuk melihat profil dan tautan sosial mereka.",
+    photoPath: "/seed/profiles/class.png",
+  };
+
+  await prisma.classProfile.upsert({
+    where: { id: 1 },
+    create: demoClassProfile,
+    update: demoClassProfile,
+  });
+
+  const demoStudentProfiles = [
+    {
+      id: "demo-student-budi",
+      name: "Budi Santoso",
+      role: "Ketua Kelas",
+      bio: "Suka membangun aplikasi web dan mengorganisasi tim saat mengerjakan project kelas.",
+      photoPath: "/seed/profiles/budi.png",
+      socialLinks: [
+        "https://www.tiktok.com/@budi",
+        "https://www.instagram.com/budi.santoso",
+        "https://github.com/budi-santoso",
+      ].join("\n"),
+      sortOrder: 1,
+      isVisible: true,
+    },
+    {
+      id: "demo-student-sari",
+      name: "Sari Dewi",
+      role: "Wakil Ketua",
+      bio: "Tertarik pada desain antarmuka dan pengalaman pengguna yang sederhana.",
+      photoPath: "/seed/profiles/sari.png",
+      socialLinks: [
+        "https://www.tiktok.com/@sari",
+        "https://www.instagram.com/sari.dewi",
+        "https://github.com/sari-dewi",
+      ].join("\n"),
+      sortOrder: 2,
+      isVisible: true,
+    },
+    {
+      id: "demo-student-raka",
+      name: "Raka Pratama",
+      role: "Anggota",
+      bio: "Senang bereksperimen dengan game, logika, dan hal-hal teknis di balik layar.",
+      photoPath: "/seed/profiles/raka.png",
+      socialLinks: [
+        "https://www.tiktok.com/@raka",
+        "https://www.instagram.com/raka.pratama",
+        "https://github.com/raka-pratama",
+      ].join("\n"),
+      sortOrder: 3,
+      isVisible: true,
+    },
+    {
+      id: "demo-student-nabila",
+      name: "Nabila Putri",
+      role: "Sekretaris",
+      bio: "Menjaga catatan tim dan suka membuat dokumentasi project yang rapi.",
+      photoPath: "/seed/profiles/nabila.png",
+      socialLinks: [
+        "https://www.tiktok.com/@nabila",
+        "https://www.instagram.com/nabila.putri",
+        "https://github.com/nabila-putri",
+      ].join("\n"),
+      sortOrder: 4,
+      isVisible: true,
+    },
+    {
+      id: "demo-student-fajar",
+      name: "Fajar Nugroho",
+      role: "Anggota",
+      bio: "Suka mengulik perangkat keras dan sensor untuk project IoT.",
+      photoPath: "/seed/profiles/fajar.png",
+      socialLinks: "https://github.com/fajar-nugroho",
+      sortOrder: 5,
+      isVisible: true,
+    },
+    {
+      id: "demo-student-alya",
+      name: "Alya Rahma",
+      role: "Bendahara",
+      bio: "Memastikan kebutuhan tim tercatat dan project tetap berjalan sesuai rencana.",
+      photoPath: "/seed/profiles/alya.png",
+      socialLinks: "https://www.instagram.com/alya.rahma",
+      sortOrder: 6,
+      isVisible: true,
+    },
+  ];
+
+  for (const student of demoStudentProfiles) {
+    const { id, ...data } = student;
+
+    await prisma.studentProfile.upsert({
+      where: { id },
+      create: student,
+      update: data,
+    });
+  }
+
   console.log(`${demoProjects.length} demo projects ready. Admin id: ${adminId.slice(0, 6)}...`);
+  console.log(`${demoPklSubmissions.length} demo PKL submissions ready.`);
+  console.log(`1 class profile and ${demoStudentProfiles.length} student profiles ready.`);
 }
 
 main()

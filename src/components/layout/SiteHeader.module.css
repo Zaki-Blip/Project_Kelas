@@ -60,7 +60,8 @@
 }
 
 .navLink:hover,
-.navLink:focus-visible {
+.navLink:focus-visible,
+.navLink[aria-current="page"] {
   border-color: var(--color-blue);
 }
 
@@ -142,8 +143,9 @@
 }
 
 .mobileNavLink:hover,
-.mobileNavLink:focus-visible {
-  background: var(--color-bg);
+.mobileNavLink:focus-visible,
+.mobileNavLink[aria-current="page"] {
+  background: var(--color-yellow);
 }
 
 .mobileUser {

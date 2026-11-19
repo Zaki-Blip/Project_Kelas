@@ -65,6 +65,7 @@ export async function reviewPklSubmissionAction(formData: FormData): Promise<voi
             : parsed.data.reviewNote || null,
         reviewedAt: parsed.data.status === "SUBMITTED" ? null : new Date(),
       },
+      select: { id: true },
     });
   } catch (error) {
     if (
@@ -114,6 +115,7 @@ export async function deletePklSubmissionAction(formData: FormData): Promise<voi
   try {
     await prisma.pklSubmission.delete({
       where: { id: parsedId.data },
+      select: { id: true },
     });
   } catch (error) {
     if (

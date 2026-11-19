@@ -5,12 +5,14 @@
 
 .heroGrid {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--space-8);
   align-items: center;
 }
 
 .copy {
   display: grid;
+  min-width: 0;
   gap: var(--space-5);
   max-width: 660px;
 }
@@ -71,6 +73,7 @@
 .visual {
   position: relative;
   width: min(100%, 560px);
+  min-width: 0;
   justify-self: center;
   padding: 18px 18px 26px 0;
 }
