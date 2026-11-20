@@ -22,6 +22,7 @@ const envSchema = z.object({
     }, "APP_URL must use https in production (localhost is allowed for local builds)."),
   AUTH_SECRET: z.string().min(32, "AUTH_SECRET must be at least 32 characters."),
   BLOB_READ_WRITE_TOKEN: z.string().optional(),
+  FORMSPREE_ENDPOINT: z.string().optional(),
   PREVIEW_ALLOWED_HOSTS: z.string().default("*.vercel.app"),
 });
 
@@ -30,6 +31,7 @@ const parsed = envSchema.safeParse({
   APP_URL: process.env.APP_URL,
   AUTH_SECRET: process.env.AUTH_SECRET,
   BLOB_READ_WRITE_TOKEN: process.env.BLOB_READ_WRITE_TOKEN,
+  FORMSPREE_ENDPOINT: process.env.FORMSPREE_ENDPOINT,
   PREVIEW_ALLOWED_HOSTS: process.env.PREVIEW_ALLOWED_HOSTS,
 });
 

@@ -12,8 +12,9 @@ Katalog karya siswa untuk melihat, mencari, dan mencoba proyek kelas. Aplikasi i
 - Live preview dalam iframe yang di-sandbox dan dibatasi host allowlist.
 - Halaman `/profil-kelas` dengan identitas kelas, galeri foto siswa, overlay tautan sosial siswa, dan modal profil.
 - Panel `/admin` untuk CRUD project, kategori, teknologi, laporan PKL, serta profil kelas dan siswa.
-- Halaman `/laporan-pkl` untuk siswa mengumpulkan hasil laporan PKL.
+- Halaman `/laporan-pkl` dengan status **Coming Soon**; pengumpulan laporan dibuka 1 bulan sebelum masa PKL selesai.
 - Halaman `/admin/laporan-pkl` untuk admin meninjau, memberi catatan, dan menghapus laporan.
+- Kotak saran di beranda untuk pengguna yang sudah login, terhubung ke Formspree.
 - PWA Web Manifest (`/manifest.webmanifest`), ikon any/maskable, service worker production, dan halaman offline.
 - OpenGraph generator dinamis (`/opengraph-image`), Twitter Card, canonical, dan metadata artikel untuk detail proyek.
 - Structured Data Schema.org JSON-LD (`WebSite`, `EducationalOrganization`, `CollectionPage`/`ItemList`, `AboutPage`, `ProfilePage`, `CreativeWork`, `BreadcrumbList`) dengan serializer yang aman.
@@ -37,6 +38,7 @@ Katalog karya siswa untuk melihat, mencari, dan mencoba proyek kelas. Aplikasi i
 - npm.
 - MySQL 8 (lokal atau hosted).
 - Vercel Blob token untuk upload gambar.
+- Endpoint Formspree untuk kotak saran beranda (opsional; form menampilkan pesan belum aktif jika kosong).
 
 ## Menjalankan secara lokal
 
@@ -61,6 +63,7 @@ Katalog karya siswa untuk melihat, mencari, dan mencoba proyek kelas. Aplikasi i
    APP_URL="http://localhost:3000"
    AUTH_SECRET="isi-dengan-secret-acak-minimal-32-byte"
    BLOB_READ_WRITE_TOKEN=""
+   FORMSPREE_ENDPOINT=""
    PREVIEW_ALLOWED_HOSTS="*.vercel.app"
    SEED_ADMIN_NAME="Admin KaryaKelas"
    SEED_ADMIN_USERNAME="admin"
@@ -100,12 +103,31 @@ Jangan gunakan kredensial seed di production. Ganti `SEED_ADMIN_*` dan set `SEED
 | `APP_URL` | Ya | Origin canonical aplikasi. Gunakan `https://...` di production. |
 | `AUTH_SECRET` | Ya | Secret acak minimal 32 byte untuk HMAC rate-limit. |
 | `BLOB_READ_WRITE_TOKEN` | Upload | Token Vercel Blob. Upload gagal dengan pesan yang jelas jika kosong. |
+| `FORMSPREE_ENDPOINT` | Saran | Endpoint Formspree untuk kotak saran beranda, misalnya `https://formspree.io/f/xxxxxxxx`. Jika kosong, form menampilkan pesan belum aktif. |
 | `PREVIEW_ALLOWED_HOSTS` | Tidak | Daftar host preview dipisah koma. Mendukung wildcard, misalnya `*.vercel.app,*.netlify.app`. |
 | `SEED_ADMIN_NAME` | Seed | Nama admin pertama. |
 | `SEED_ADMIN_USERNAME` | Seed | Username admin pertama. |
 | `SEED_ADMIN_EMAIL` | Seed | Email admin pertama. |
 | `SEED_ADMIN_PASSWORD` | Seed | Password admin pertama, minimal 8 karakter. |
 | `SEED_DEMO_DATA` | Seed | Set `true` untuk membuat user, project, laporan PKL, dan profil kelas/siswa demo. |
+
+## Kotak saran (Formspree)
+
+Kotak saran ada di beranda, pada bagian `#kotak-saran`. Form hanya bisa dikirim oleh pengguna yang sudah login; pengunjung yang belum masuk akan melihat tombol login.
+
+Untuk mengaktifkannya:
+
+1. Buat form baru di [Formspree](https://formspree.io).
+2. Salin endpoint form, misalnya `https://formspree.io/f/xxxxxxxx`.
+3. Isi `.env`:
+
+   ```dotenv
+   FORMSPREE_ENDPOINT="https://formspree.io/f/xxxxxxxx"
+   ```
+
+4. Restart `npm run dev`. Untuk production, tambahkan variabel yang sama di Vercel lalu redeploy.
+
+Server Action mengirim nama, email, username, jenis tanggapan, isi tanggapan, sumber halaman, dan waktu kirim ke Formspree. Endpoint divalidasi agar hanya menerima host resmi `formspree.io` dengan HTTPS. Jika `FORMSPREE_ENDPOINT` kosong atau tidak valid, form menampilkan pesan bahwa kotak saran belum aktif.
 
 ## Skrip
 
@@ -125,7 +147,8 @@ Jangan gunakan kredensial seed di production. Ganti `SEED_ADMIN_*` dan set `SEED
 
 ## Alur laporan PKL
 
-- Siswa membuka `/laporan-pkl`, mengisi judul, tempat PKL, ringkasan, dan URL laporan HTTPS.
+- `/laporan-pkl` saat ini menampilkan status **Coming Soon**. Pengumpulan laporan akan dibuka **1 bulan sebelum masa PKL selesai**.
+- Setelah dibuka, siswa mengisi judul, tempat PKL, ringkasan, dan URL laporan HTTPS.
 - Satu siswa hanya punya satu laporan (`userId` unik).
 - Siswa dapat mengubah laporan selama status belum `REVIEWED`.
 - Setiap perubahan mengembalikan status ke `SUBMITTED` dan menghapus catatan/tanggal tinjauan.
@@ -176,14 +199,15 @@ Target: Vercel untuk aplikasi, MySQL hosted (misalnya Railway) untuk database, d
 2. Set `APP_URL` ke domain production `https://...`.
 3. Generate `AUTH_SECRET` acak minimal 32 byte.
 4. Buat Vercel Blob store dan set `BLOB_READ_WRITE_TOKEN`.
-5. Set `PREVIEW_ALLOWED_HOSTS` sesuai domain preview yang diizinkan.
-6. Jalankan migrasi production:
+5. Buat form Formspree dan set `FORMSPREE_ENDPOINT` ke endpoint form tersebut.
+6. Set `PREVIEW_ALLOWED_HOSTS` sesuai domain preview yang diizinkan.
+7. Jalankan migrasi production:
 
    ```bash
    npm run db:deploy
    ```
 
-7. Jalankan seed admin:
+8. Jalankan seed admin:
 
    ```bash
    npm run db:seed
@@ -191,7 +215,7 @@ Target: Vercel untuk aplikasi, MySQL hosted (misalnya Railway) untuk database, d
 
    Set `SEED_DEMO_DATA="false"` di production. Seed bersifat idempotent, tetapi tetap tinjau data yang dibuat.
 
-8. Deploy ke Vercel. Pastikan environment variable di atas tersedia di environment production.
+9. Deploy ke Vercel. Pastikan environment variable di atas tersedia di environment production.
 
 ## Pengujian
 
@@ -199,7 +223,7 @@ Status terakhir:
 
 | Perintah | Hasil |
 | --- | --- |
-| `npm run test` | 12 file, 187 test, semua lulus. |
+| `npm run test` | 13 file, 193 test, semua lulus. |
 | `npm run typecheck` | Lulus. |
 | `npm run lint` | Lulus. |
 | `npm run build` | Lulus; semua rute terkompilasi, termasuk static icon, robots, sitemap, manifest, dan opengraph-image. |

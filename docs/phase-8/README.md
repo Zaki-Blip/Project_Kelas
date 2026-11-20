@@ -1,6 +1,6 @@
 # Phase 8 — PKL Report Collection, Bug Fixes, and Deployment Notes
 
-Status: implementation and QA complete, awaiting approval before final deployment checks.
+Status: implementation and QA complete, awaiting approval before final deployment checks. `/laporan-pkl` is currently in Coming Soon mode; submission opens 1 month before the PKL period ends.
 
 ## Scope
 
@@ -9,7 +9,7 @@ Phase 8 closes the unfinished work from Phases 6–7 and adds the requested PKL 
 Included:
 
 - PKL submission model, migration, validation, queries, and Server Actions.
-- Student page `/laporan-pkl` for submitting and editing a report.
+- Student page `/laporan-pkl` for submitting and editing a report. The page currently shows a Coming Soon state until the submission window opens.
 - Admin page `/admin/laporan-pkl` for searching, reviewing, and deleting reports.
 - Demo PKL submissions in the idempotent seed.
 - Fix for the admin delete dialog so it is never clipped by table scroll containers.
@@ -69,7 +69,7 @@ Migration: `prisma/migrations/20261112023427_add_pkl_submissions/migration.sql`.
 
 ## Pages
 
-- `/laporan-pkl` (protected): shows the current submission, status, admin note, and an edit form. The form is read-only after `REVIEWED`.
+- `/laporan-pkl` (protected): currently shows a Coming Soon panel explaining that submission opens 1 month before the PKL period ends. The existing submission, status, admin note, and edit form remain in the codebase for when the window opens; the form is read-only after `REVIEWED`.
 - `/admin/laporan-pkl` (admin only): searchable and paginated table with student, report, status, updated date, review form, and delete action.
 - Navigation links were added to `SiteHeader` and `AdminNav`.
 - `/laporan-pkl` was added to `PROTECTED_PATHS` in `src/proxy.ts`.

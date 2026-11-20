@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 
+import { FeedbackSection } from "@/components/feedback/FeedbackSection";
 import { ProjectGrid } from "@/components/projects/ProjectGrid";
 import { ProjectGridSkeleton } from "@/components/projects/ProjectGridSkeleton";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -44,6 +45,16 @@ export const metadata: Metadata = {
     images: [DEFAULT_OG_IMAGE],
   },
 };
+
+type HomeSearchParams = Promise<
+  Record<string, string | string[] | undefined>
+>;
+
+function firstParam(
+  value: string | string[] | undefined,
+): string | undefined {
+  return Array.isArray(value) ? value[0] : value;
+}
 
 const features = [
   {
@@ -132,8 +143,13 @@ function LatestProjectsFallback({ isAuthenticated }: { isAuthenticated: boolean 
   );
 }
 
-export default async function HomePage() {
-  const user = await getCurrentUser();
+export default async function HomePage({
+  searchParams,
+}: {
+  searchParams: HomeSearchParams;
+}) {
+  const [user, params] = await Promise.all([getCurrentUser(), searchParams]);
+  const feedbackSuccess = firstParam(params.feedback) === "success";
   const siteJsonLd = {
     "@context": "https://schema.org",
     "@graph": [
@@ -262,6 +278,8 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      <FeedbackSection user={user} showSuccess={feedbackSuccess} />
 
       <section className={styles.ctaSection}>
         <div className={cn("container", styles.ctaCard)}>

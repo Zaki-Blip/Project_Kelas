@@ -23,7 +23,9 @@ const securityHeaders = [
     : []),
 ];
 
+
 const nextConfig: NextConfig = {
+  allowedDevOrigins: ["10.16.144.146"],
   poweredByHeader: false,
   serverExternalPackages: ["@node-rs/argon2", "@prisma/adapter-mariadb", "mariadb"],
   images: {

@@ -15,3 +15,8 @@ export type AdminActionState = {
   formError?: string;
   fieldErrors?: Record<string, string[] | undefined>;
 };
+
+export type FeedbackActionState = {
+  formError?: string;
+  fieldErrors?: Record<string, string[] | undefined>;
+};

@@ -161,7 +161,7 @@ Results after the Phase 9 changes:
 
 | Command | Result |
 | --- | --- |
-| `npm run test` | 12 files, 187 tests, all passed. |
+| `npm run test` | 13 files, 193 tests, all passed. |
 | `npm run typecheck` | Passed. |
 | `npm run lint` | Passed. |
 | `npm run build` | Passed. All application routes are dynamic; `/icon.svg` is static. |
